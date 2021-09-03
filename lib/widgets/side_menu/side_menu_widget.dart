@@ -4,7 +4,7 @@ import 'package:crabs_trade/helpers/responsiveness.dart';
 import 'package:flutter/material.dart';
 
 class SideMenuWidget extends StatefulWidget {
-  String route;
+  final String route;
   SideMenuWidget({Key? key, required this.route}) : super(key: key);
 
   @override
@@ -15,50 +15,44 @@ class MenuItem {
   final String title;
   final IconData icon;
   final String route;
-  final bool isActive;
 
   const MenuItem(
     this.title,
     this.icon,
     this.route,
-    this.isActive,
   );
 }
 
 class _SideMenuWidgetState extends State<SideMenuWidget> {
   final List<MenuItem> _menuItems = [
-    MenuItem(
+    const MenuItem(
       'Dashboard',
       Icons.space_dashboard_outlined,
       '/dashboard',
-      false,
     ),
-    MenuItem(
+    const MenuItem(
       'Tickers',
       Icons.trending_up,
       '/tickers',
-      false,
     ),
-    MenuItem(
+    const MenuItem(
       'Wallet',
       Icons.account_balance_wallet_outlined,
       '/wallet',
-      false,
     ),
-    MenuItem(
+    const MenuItem(
       'Signout',
       Icons.exit_to_app,
       '/auth',
-      false,
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    String route = widget.route;
-    double _width = MediaQuery.of(context).size.width;
+    var route = widget.route;
+    var _width = MediaQuery.of(context).size.width;
     return Container(
-        padding: EdgeInsets.only(top: 6),
+        padding: const EdgeInsets.only(top: 6),
         color: dark,
         child: ListView(
           children: [
@@ -167,7 +161,7 @@ class _SideMenuItem extends StatelessWidget {
                     children: [
                       Icon(data.icon,
                           color: (activeRoute == data.route) ? active : light),
-                      SizedBox(width: 5),
+                      const SizedBox(width: 5),
                       CustomText(
                           text: data.title,
                           size: (activeRoute == data.route) ? 20 : 16,

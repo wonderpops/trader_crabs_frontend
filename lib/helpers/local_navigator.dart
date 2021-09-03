@@ -13,7 +13,7 @@ class localNavigator extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (route) {
       case MainNavigationRoutesNames.dashboard:
-        return DashboardWidget();
+        return const DashboardWidget();
       case MainNavigationRoutesNames.tickers:
         return Container(
             child: CustomText(
@@ -30,7 +30,7 @@ class localNavigator extends StatelessWidget {
         ));
       default:
         return Container(
-            child: CustomText(
+            child: const CustomText(
           text: 'Unknown route',
           color: active,
           size: 20,

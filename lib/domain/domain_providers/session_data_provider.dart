@@ -1,6 +1,4 @@
 import 'dart:html';
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 
 class SessionDataProvider {
@@ -14,13 +12,13 @@ class SessionDataProvider {
   }
 
   String _getCookieWithEncryption(key) {
-    String cookies = document.cookie!;
-    List<String> listValues = cookies.isNotEmpty ? cookies.split(";") : [];
-    String matchVal = "";
-    for (int i = 0; i < listValues.length; i++) {
-      List<String> map = listValues[i].split("=");
-      String _key = map[0].trim();
-      String _val = map[1].trim();
+    var cookies = document.cookie!;
+    var listValues = cookies.isNotEmpty ? cookies.split(';') : [];
+    var matchVal = '';
+    for (var i = 0; i < listValues.length; i++) {
+      List<String> map = listValues[i].split('=');
+      var _key = map[0].trim();
+      var _val = map[1].trim();
       if (key == _key) {
         matchVal = _val;
         break;
@@ -37,13 +35,13 @@ class SessionDataProvider {
   }
 
   String? _getCookie(key) {
-    String cookies = document.cookie!;
-    List<String> listValues = cookies.isNotEmpty ? cookies.split(";") : [];
-    String? matchVal = null;
-    for (int i = 0; i < listValues.length; i++) {
-      List<String> map = listValues[i].split("=");
-      String _key = map[0].trim();
-      String _val = map[1].trim();
+    var cookies = document.cookie!;
+    var listValues = cookies.isNotEmpty ? cookies.split(';') : [];
+    String? matchVal;
+    for (var i = 0; i < listValues.length; i++) {
+      List<String> map = listValues[i].split('=');
+      var _key = map[0].trim();
+      var _val = map[1].trim();
       if (key == _key) {
         matchVal = _val;
         break;

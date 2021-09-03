@@ -11,8 +11,8 @@ import 'large_screen_layout.dart';
 
 class MainLayout extends StatelessWidget {
   final sessionModel = SessionModel();
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
-  String route;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  final String route;
 
   MainLayout({Key? key, required this.route}) : super(key: key);
 
@@ -26,7 +26,7 @@ class MainLayout extends StatelessWidget {
             return Center(
               child: Text(
                 '${snapshot.error} occured',
-                style: TextStyle(fontSize: 18),
+                style: const TextStyle(fontSize: 18),
               ),
             );
 
@@ -51,7 +51,7 @@ class MainLayout extends StatelessWidget {
                     mediumScreen: LargeScreenLayout(
                       route: route,
                     ),
-                    smallScreen: SmallScreenLayout()),
+                    smallScreen: const SmallScreenLayout()),
               );
             } else {
               return AuthProvider(
@@ -62,7 +62,7 @@ class MainLayout extends StatelessWidget {
         // Displaying LoadingSpinner to indicate waiting state
         return Container(
           color: dark,
-          child: Center(
+          child: const Center(
             child: CircularProgressIndicator(
               backgroundColor: light,
               color: active,

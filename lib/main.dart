@@ -1,7 +1,4 @@
-import 'dart:html' as html;
-import 'package:crabs_trade/constants/animations.dart';
 import 'package:crabs_trade/constants/style.dart';
-import 'package:crabs_trade/domain/domain_providers/session_data_provider.dart';
 import 'package:crabs_trade/helpers/main_navigation.dart';
 import 'package:crabs_trade/helpers/session_model.dart';
 import 'package:crabs_trade/widgets/auth/auth_model.dart';
@@ -12,8 +9,7 @@ import 'package:flutter/material.dart';
 
 void main() async {
   final sessionModel = SessionModel();
-  bool isAuth = await sessionModel.checkAuth();
-  final sessionDataProvider = SessionDataProvider();
+  var isAuth = await sessionModel.checkAuth();
   runApp(MyApp(
     sessionModel: sessionModel,
     isAuth: isAuth,
@@ -22,7 +18,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final sessionModel;
-  bool isAuth;
+  final bool isAuth;
   static final mainNavigation = MainNavigation();
   MyApp({Key? key, required this.sessionModel, required this.isAuth})
       : super(key: key);
@@ -38,7 +34,7 @@ class MyApp extends StatelessWidget {
         accentColor: active,
         primaryColor: active,
         primarySwatch: Colors.blue,
-        inputDecorationTheme: InputDecorationTheme(
+        inputDecorationTheme: const InputDecorationTheme(
           border: OutlineInputBorder(borderSide: BorderSide(color: light)),
           labelStyle: TextStyle(color: active),
         ),
@@ -46,26 +42,29 @@ class MyApp extends StatelessWidget {
       onGenerateRoute: (settings) {
         if (settings.name == MainNavigationRoutesNames.auth) {
           return MaterialPageRoute(
-              settings: RouteSettings(name: MainNavigationRoutesNames.auth),
+              settings:
+                  const RouteSettings(name: MainNavigationRoutesNames.auth),
               builder: (context) =>
                   AuthProvider(model: AuthModel(), child: const AuthWidget()));
         }
         if (settings.name == MainNavigationRoutesNames.dashboard) {
           return MaterialPageRoute(
-              settings:
-                  RouteSettings(name: MainNavigationRoutesNames.dashboard),
+              settings: const RouteSettings(
+                  name: MainNavigationRoutesNames.dashboard),
               builder: (context) =>
                   MainLayout(route: MainNavigationRoutesNames.dashboard));
         }
         if (settings.name == MainNavigationRoutesNames.tickers) {
           return MaterialPageRoute(
-              settings: RouteSettings(name: MainNavigationRoutesNames.tickers),
+              settings:
+                  const RouteSettings(name: MainNavigationRoutesNames.tickers),
               builder: (context) =>
                   MainLayout(route: MainNavigationRoutesNames.tickers));
         }
         if (settings.name == MainNavigationRoutesNames.wallet) {
           return MaterialPageRoute(
-              settings: RouteSettings(name: MainNavigationRoutesNames.wallet),
+              settings:
+                  const RouteSettings(name: MainNavigationRoutesNames.wallet),
               builder: (context) =>
                   MainLayout(route: MainNavigationRoutesNames.wallet));
         }
@@ -97,7 +96,7 @@ class MyApp extends StatelessWidget {
         // }
       },
       onUnknownRoute: (settings) => sessionModel.checkAuth() == true
-          ? MaterialPageRoute(builder: (context) => PageNotFound())
+          ? MaterialPageRoute(builder: (context) => const PageNotFound())
           : MaterialPageRoute(
               builder: (context) =>
                   AuthProvider(model: AuthModel(), child: const AuthWidget())),

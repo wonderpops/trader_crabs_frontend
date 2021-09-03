@@ -16,7 +16,7 @@ class DashboardWidget extends StatefulWidget {
 class _DashboardWidgetState extends State<DashboardWidget> {
   @override
   Widget build(BuildContext context) {
-    return Test();
+    return const Test();
   }
 }
 
@@ -43,7 +43,7 @@ class Test extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.max,
       children: [
-        _Tikers(),
+        const _Tikers(),
         Padding(
           padding: const EdgeInsets.only(top: 10),
           child: Row(
@@ -58,7 +58,7 @@ class Test extends StatelessWidget {
                     Container(
                       // height: 100,
                       // color: Colors.red,
-                      child: _WalletHistory(),
+                      child: const _WalletHistory(),
                     )
                   ],
                 ),
@@ -71,7 +71,7 @@ class Test extends StatelessWidget {
                     Container(
                       // height: 100,
                       // color: Colors.blue,
-                      child: _AllActions(),
+                      child: const _AllActions(),
                     )
                   ],
                 ),
@@ -90,14 +90,14 @@ class _Tikers extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = ApiProvider.watch(context)?.model;
-    List tickers = model?.tikers ?? [];
+    var tickers = model?.tikers ?? [];
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
               child: CustomText(
                 text: 'Tickers',
                 color: light,
@@ -205,15 +205,15 @@ class _WalletHistory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = ApiProvider.watch(context)?.model;
-    List actions = model?.allActions ?? [];
-    List walletData = [];
-    double m_value = 0.0;
-    int money = model?.walletMoney ?? 0;
+    var actions = model?.allActions ?? [];
+    var walletData = [];
+    var m_value = 0.0;
+    var money = model?.walletMoney ?? 0;
 
     if (actions.isNotEmpty) {
       actions.reversed.forEach((element) {
         m_value += element['profit'];
-        DateTime date = DateTime.parse(element['date']);
+        var date = DateTime.parse(element['date']);
         walletData.add(
             {'date': date.millisecondsSinceEpoch.toDouble(), 'value': m_value});
       });
@@ -271,13 +271,12 @@ class _WalletHistory extends StatelessWidget {
                       titlesData: FlTitlesData(
                           bottomTitles: SideTitles(
                             getTextStyles: (context, value) {
-                              return TextStyle(color: light);
+                              return const TextStyle(color: light);
                             },
                             showTitles: true,
                             getTitles: (value) {
-                              final DateTime date =
-                                  DateTime.fromMillisecondsSinceEpoch(
-                                      value.toInt());
+                              var date = DateTime.fromMillisecondsSinceEpoch(
+                                  value.toInt());
                               return DateFormat.Hm().format(date);
                             },
                             margin: 8,
@@ -286,7 +285,7 @@ class _WalletHistory extends StatelessWidget {
                           leftTitles: SideTitles(
                             showTitles: true,
                             getTextStyles: (context, value) {
-                              return TextStyle(color: light);
+                              return const TextStyle(color: light);
                             },
                           ),
                           rightTitles: SideTitles(showTitles: false),
@@ -305,7 +304,7 @@ class _WalletHistory extends StatelessWidget {
                       // read about it in the LineChartData section
                     ),
                     swapAnimationDuration:
-                        Duration(milliseconds: 150), // Optional
+                        const Duration(milliseconds: 150), // Optional
                     swapAnimationCurve: Curves.linear, // Optional
                   ),
                 ),
@@ -324,7 +323,7 @@ class _AllActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = ApiProvider.watch(context)?.model;
-    List actions = model?.allActions ?? [];
+    var actions = model?.allActions ?? [];
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -343,9 +342,9 @@ class _AllActions extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 8, horizontal: 8),
+                        const Padding(
+                          padding:
+                              EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                           child: CustomText(
                             text: 'Actions',
                             color: light,
@@ -362,28 +361,28 @@ class _AllActions extends StatelessWidget {
                               MaterialStateColor.resolveWith((states) => dark),
                           dataRowColor:
                               MaterialStateColor.resolveWith((states) => dark),
-                          headingTextStyle: TextStyle(color: light),
-                          dataTextStyle: TextStyle(color: light),
+                          headingTextStyle: const TextStyle(color: light),
+                          dataTextStyle: const TextStyle(color: light),
                           columnSpacing: 12,
                           horizontalMargin: 12,
                           minWidth: 300,
                           columns: [
-                            DataColumn2(
+                            const DataColumn2(
                               label: Text('Ticker',
                                   style: TextStyle(color: active)),
                               size: ColumnSize.L,
                             ),
-                            DataColumn2(
+                            const DataColumn2(
                               label: Text('Action',
                                   style: TextStyle(color: active)),
                               size: ColumnSize.L,
                             ),
-                            DataColumn2(
+                            const DataColumn2(
                               label: Text('Price',
                                   style: TextStyle(color: active)),
                               size: ColumnSize.L,
                             ),
-                            DataColumn2(
+                            const DataColumn2(
                               label: Text('Profit',
                                   style: TextStyle(color: active)),
                               size: ColumnSize.S,

@@ -8,13 +8,13 @@ class ApiModel extends ChangeNotifier {
   final _apiClient = ApiClient();
   final _sessionData = SessionDataProvider();
 
-  List<dynamic>? _tikers = null;
+  List<dynamic>? _tikers;
   List<dynamic>? get tikers => _tikers;
 
-  int? _walletMoney = null;
+  int? _walletMoney;
   int? get walletMoney => _walletMoney;
 
-  List<dynamic>? _allActions = null;
+  List<dynamic>? _allActions;
   List<dynamic>? get allActions => _allActions;
 
   Future<void> getTickers(BuildContext context) async {
@@ -24,7 +24,7 @@ class ApiModel extends ChangeNotifier {
   }
 
   Future<void> getWallet(BuildContext context) async {
-    Map<String, dynamic> wallet =
+    var wallet =
         await _apiClient.getWallet(accessToken: _sessionData.getAccessToken());
     if (wallet.containsKey('money')) {
       _walletMoney = wallet['money'];

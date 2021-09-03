@@ -14,7 +14,7 @@ class AuthWidget extends StatefulWidget {
 class _AuthWidgetState extends State<AuthWidget> {
   @override
   Widget build(BuildContext context) {
-    return AuthForm();
+    return const AuthForm();
   }
 }
 
@@ -71,15 +71,15 @@ class AuthForm extends StatelessWidget {
             ),
             TextField(
               controller: model?.usernameTextController,
-              style: TextStyle(color: light),
+              style: const TextStyle(color: light),
               decoration: InputDecoration(
-                hintStyle: TextStyle(color: light),
-                enabledBorder: new OutlineInputBorder(
-                    borderRadius: new BorderRadius.circular(20.0),
-                    borderSide: BorderSide(color: light)),
-                focusedBorder: new OutlineInputBorder(
-                  borderRadius: new BorderRadius.circular(20.0),
-                  borderSide: BorderSide(color: active),
+                hintStyle: const TextStyle(color: light),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                    borderSide: const BorderSide(color: light)),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                  borderSide: const BorderSide(color: active),
                 ),
                 labelText: 'username',
                 hintText: 'my_username',
@@ -91,18 +91,18 @@ class AuthForm extends StatelessWidget {
             TextField(
               controller: model?.passwordTextController,
               obscureText: true,
-              style: TextStyle(color: light),
+              style: const TextStyle(color: light),
               decoration: InputDecoration(
-                hintStyle: TextStyle(color: light),
+                hintStyle: const TextStyle(color: light),
                 fillColor: light,
-                enabledBorder: new OutlineInputBorder(
-                    borderRadius: new BorderRadius.circular(20.0),
-                    borderSide: BorderSide(color: light)),
-                focusedBorder: new OutlineInputBorder(
-                  borderRadius: new BorderRadius.circular(20.0),
-                  borderSide: BorderSide(color: active),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                    borderSide: const BorderSide(color: light)),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                  borderSide: const BorderSide(color: active),
                 ),
-                counterStyle: TextStyle(color: light),
+                counterStyle: const TextStyle(color: light),
                 labelText: 'Password',
                 hintText: 'mypass1234',
                 focusColor: active,
@@ -111,7 +111,7 @@ class AuthForm extends StatelessWidget {
             const SizedBox(
               height: 15,
             ),
-            _errorMessageWidget(),
+            const _errorMessageWidget(),
             Row(children: [
               Checkbox(value: true, onChanged: (value) {}),
               const CustomText(text: 'Remember Me', color: light)
@@ -119,7 +119,7 @@ class AuthForm extends StatelessWidget {
             const SizedBox(
               height: 15,
             ),
-            AuthButtonWidget(),
+            const AuthButtonWidget(),
             // Container(
             //     height: 60,
             //     width: 100,
@@ -167,8 +167,9 @@ class AuthButtonWidget extends StatelessWidget {
                   ? Container(
                       height: 30,
                       width: 30,
-                      child: CircularProgressIndicator(color: Colors.white))
-                  : CustomText(text: 'Sign In', color: Colors.white)),
+                      child:
+                          const CircularProgressIndicator(color: Colors.white))
+                  : const CustomText(text: 'Sign In', color: Colors.white)),
           Material(
             color: Colors.transparent,
             child: InkWell(
@@ -203,7 +204,7 @@ class _errorMessageWidget extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 15),
       child: Text(
         errorMessage.toString(),
-        style: TextStyle(color: Colors.redAccent),
+        style: const TextStyle(color: Colors.redAccent),
       ),
     );
   }

@@ -2,7 +2,6 @@ import 'package:crabs_trade/domain/api_client/api_client.dart';
 import 'package:crabs_trade/domain/domain_providers/session_data_provider.dart';
 import 'package:crabs_trade/helpers/main_navigation.dart';
 import 'package:flutter/cupertino.dart';
-import 'dart:convert';
 
 class AuthModel extends ChangeNotifier {
   final _apiClient = ApiClient();
@@ -48,7 +47,7 @@ class AuthModel extends ChangeNotifier {
       _sessionDataProvider.setAccessToken = sessionKeys['access_token'];
       _sessionDataProvider.setRefreshToken = sessionKeys['refresh_token'];
       _sessionDataProvider.setExpiresAt = sessionKeys['expires_at'].toString();
-      Navigator.of(context)
+      await Navigator.of(context)
           .pushReplacementNamed(MainNavigationRoutesNames.dashboard);
     } else {
       _errorMessage = 'Unkown error, please try again :c';
