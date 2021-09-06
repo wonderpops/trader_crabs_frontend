@@ -3,11 +3,13 @@ import 'package:crabs_trade/controllers/data_load_controller.dart';
 import 'package:crabs_trade/helpers/custom_text.dart';
 import 'package:crabs_trade/helpers/responsiveness.dart';
 import 'package:data_table_2/data_table_2.dart';
-import 'package:fl_chart/fl_chart.dart';
+
+// import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 class DashboardWidget extends StatelessWidget {
   final DataLoadController c = Get.find();
@@ -39,7 +41,10 @@ class DashboardWidget extends StatelessWidget {
                             Container(
                               // height: 100,
                               // color: Colors.red,
-                              child: _WalletHistory(),
+                              child: Container(
+                                child: _WalletHistory(),
+                                // width: 700,
+                              ),
                             )
                           ],
                         ),
@@ -356,6 +361,12 @@ class _TickerShimmer extends StatelessWidget {
   }
 }
 
+class WalletData {
+  WalletData(this.date, this.action);
+  final DateTime date;
+  final double action;
+}
+
 class _WalletHistory extends StatelessWidget {
   _WalletHistory({Key? key}) : super(key: key);
 
@@ -376,10 +387,12 @@ class _WalletHistory extends StatelessWidget {
             );
           } else if (snapshot.hasData) {
             final wallet_history = snapshot.data as List;
+            var wallet_data = wallet_history
+                .map((e) => WalletData(e['date'], e['value']))
+                .toList();
             return Padding(
               padding: const EdgeInsets.only(right: 10),
               child: Container(
-                height: 600,
                 width: double.maxFinite,
                 decoration: BoxDecoration(
                     color: dark, borderRadius: BorderRadius.circular(20)),
@@ -417,60 +430,44 @@ class _WalletHistory extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
-                          height: 450,
+                          height: ResponsiveWidget.is_small_screen(context)
+                              ? 300
+                              : 594,
                           width: double.maxFinite,
-                          child: LineChart(
-                            LineChartData(
-                              gridData: FlGridData(
-                                show: true,
-                                drawVerticalLine: false,
-                                getDrawingHorizontalLine: (value) {
-                                  return FlLine(
-                                    color: Colors.white12,
-                                    strokeWidth: 1,
-                                  );
-                                },
-                              ),
-                              titlesData: FlTitlesData(
-                                  bottomTitles: SideTitles(
-                                    getTextStyles: (context, value) {
-                                      return const TextStyle(color: light);
-                                    },
-                                    showTitles: true,
-                                    getTitles: (value) {
-                                      var date =
-                                          DateTime.fromMillisecondsSinceEpoch(
-                                              value.toInt());
-                                      return DateFormat.Hm().format(date);
-                                    },
-                                    margin: 8,
-                                    // interval: 21,
-                                  ),
-                                  leftTitles: SideTitles(
-                                    showTitles: true,
-                                    getTextStyles: (context, value) {
-                                      return const TextStyle(color: light);
-                                    },
-                                  ),
-                                  rightTitles: SideTitles(showTitles: false),
-                                  topTitles: SideTitles(showTitles: false)),
-                              lineBarsData: [
-                                LineChartBarData(
-                                    colors: [active],
-                                    isCurved: true,
-                                    preventCurveOverShooting: true,
-                                    aboveBarData:
-                                        BarAreaData(colors: [success]),
-                                    spots: wallet_history
-                                        .map((e) =>
-                                            FlSpot(e['date'], e['value']))
-                                        .toList())
-                              ],
-                            ),
-                            swapAnimationDuration:
-                                const Duration(milliseconds: 150), // Optional
-                            swapAnimationCurve: Curves.linear, // Optional
-                          ),
+                          child: SfCartesianChart(
+                              tooltipBehavior: TooltipBehavior(
+                                  enable: true, format: 'point.y\$'),
+                              zoomPanBehavior: ZoomPanBehavior(
+                                  enableSelectionZooming: true,
+                                  enableMouseWheelZooming: true),
+                              primaryXAxis: DateTimeAxis(
+                                  intervalType: DateTimeIntervalType.auto,
+                                  dateFormat: DateFormat.yMd()),
+                              series: <SplineAreaSeries<WalletData, DateTime>>[
+                                SplineAreaSeries<WalletData, DateTime>(
+                                    name: 'Money',
+                                    splineType: SplineType.cardinal,
+                                    color: active,
+                                    borderWidth: 4,
+                                    markerSettings: const MarkerSettings(
+                                        isVisible: true,
+                                        // Marker shape is set to diamond
+                                        shape: DataMarkerType.diamond),
+                                    borderGradient: const LinearGradient(
+                                        colors: <Color>[
+                                          Color.fromRGBO(50, 140, 100, 1),
+                                          Color.fromRGBO(50, 100, 240, 1)
+                                        ],
+                                        stops: <double>[
+                                          0.2,
+                                          0.9
+                                        ]),
+                                    dataSource: wallet_data,
+                                    xValueMapper: (WalletData action, _) =>
+                                        action.date,
+                                    yValueMapper: (WalletData action, _) =>
+                                        action.action)
+                              ]),
                         ),
                       ),
                     ],
@@ -486,11 +483,12 @@ class _WalletHistory extends StatelessWidget {
     }
 
     // print(walletData.toString());
-
+    //TODO don't calculate wallet_data while build
+    var wallet_data =
+        c.wallet_history.map((e) => WalletData(e['date'], e['value'])).toList();
     return Padding(
       padding: const EdgeInsets.only(right: 10),
       child: Container(
-        height: 600,
         width: double.maxFinite,
         decoration:
             BoxDecoration(color: dark, borderRadius: BorderRadius.circular(20)),
@@ -528,59 +526,41 @@ class _WalletHistory extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-                  height: 450,
+                  height: ResponsiveWidget.is_small_screen(context) ? 300 : 594,
                   width: double.maxFinite,
-                  child: LineChart(
-                    LineChartData(
-                      gridData: FlGridData(
-                        show: true,
-                        drawVerticalLine: false,
-                        getDrawingHorizontalLine: (value) {
-                          return FlLine(
+                  child: SfCartesianChart(
+                      tooltipBehavior:
+                          TooltipBehavior(enable: true, format: 'point.y\$'),
+                      zoomPanBehavior: ZoomPanBehavior(
+                          enableSelectionZooming: true,
+                          enableMouseWheelZooming: true),
+                      primaryXAxis: DateTimeAxis(
+                          intervalType: DateTimeIntervalType.auto,
+                          dateFormat: DateFormat.yMd()),
+                      series: <SplineAreaSeries<WalletData, DateTime>>[
+                        SplineAreaSeries<WalletData, DateTime>(
+                            name: 'Money',
+                            splineType: SplineType.cardinal,
                             color: active,
-                            strokeWidth: 1,
-                          );
-                        },
-                      ),
-                      titlesData: FlTitlesData(
-                          bottomTitles: SideTitles(
-                            getTextStyles: (context, value) {
-                              return const TextStyle(color: light);
-                            },
-                            showTitles: true,
-                            getTitles: (value) {
-                              var date = DateTime.fromMillisecondsSinceEpoch(
-                                  value.toInt());
-                              return DateFormat.Hm().format(date);
-                            },
-                            margin: 8,
-                            // interval: 21,
-                          ),
-                          leftTitles: SideTitles(
-                            showTitles: true,
-                            getTextStyles: (context, value) {
-                              return const TextStyle(color: light);
-                            },
-                          ),
-                          rightTitles: SideTitles(showTitles: false),
-                          topTitles: SideTitles(showTitles: false)),
-
-                      lineBarsData: [
-                        LineChartBarData(
-                            colors: [active],
-                            isCurved: true,
-                            preventCurveOverShooting: true,
-                            aboveBarData: BarAreaData(colors: [success]),
-                            spots: c.wallet_history
-                                .map((e) => FlSpot(e['date'], e['value']))
-                                .toList())
-                      ],
-                      // read about it in the LineChartData section
-                    ),
-                    swapAnimationDuration:
-                        const Duration(milliseconds: 150), // Optional
-                    swapAnimationCurve: Curves.linear, // Optional
-                  ),
+                            borderWidth: 4,
+                            markerSettings: const MarkerSettings(
+                                isVisible: true,
+                                // Marker shape is set to diamond
+                                shape: DataMarkerType.diamond),
+                            borderGradient: const LinearGradient(
+                                colors: <Color>[
+                                  Color.fromRGBO(50, 140, 100, 1),
+                                  Color.fromRGBO(50, 100, 240, 1)
+                                ],
+                                stops: <double>[
+                                  0.2,
+                                  0.9
+                                ]),
+                            dataSource: wallet_data,
+                            xValueMapper: (WalletData action, _) => action.date,
+                            yValueMapper: (WalletData action, _) =>
+                                action.action)
+                      ]),
                 ),
               ),
             ],
@@ -599,7 +579,6 @@ class _WalletHistoryShimmer extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 10),
       child: Container(
-        height: 600,
         width: double.maxFinite,
         decoration:
             BoxDecoration(color: dark, borderRadius: BorderRadius.circular(20)),
@@ -627,7 +606,8 @@ class _WalletHistoryShimmer extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-                    height: 450,
+                    height:
+                        ResponsiveWidget.is_small_screen(context) ? 340 : 634,
                     width: double.maxFinite,
                     child: Shimmer.fromColors(
                         baseColor: light.withOpacity(.2),
@@ -688,7 +668,8 @@ class _AllActions extends StatelessWidget {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Container(
-                    height: 600,
+                    height:
+                        ResponsiveWidget.is_small_screen(context) ? 300 : 720,
                     decoration: BoxDecoration(
                         color: dark, borderRadius: BorderRadius.circular(20)),
                     child: Padding(
@@ -794,7 +775,7 @@ class _AllActions extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         children: [
           Container(
-            height: 600,
+            height: ResponsiveWidget.is_small_screen(context) ? 340 : 720,
             decoration: BoxDecoration(
                 color: dark, borderRadius: BorderRadius.circular(20)),
             child: Padding(
@@ -900,7 +881,6 @@ class _ActionsShimmer extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         children: [
           Container(
-            height: 600,
             decoration: BoxDecoration(
                 color: dark, borderRadius: BorderRadius.circular(20)),
             child: Padding(
@@ -933,7 +913,7 @@ class _ActionsShimmer extends StatelessWidget {
                               color: light.withOpacity(.2),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            height: 500,
+                            height: 637,
                             child: Padding(
                               padding: const EdgeInsets.all(8),
                               child: Shimmer.fromColors(
@@ -943,6 +923,20 @@ class _ActionsShimmer extends StatelessWidget {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,
                                   children: [
+                                    Container(
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          color: active,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        )),
+                                    Container(
+                                        height: 20,
+                                        decoration: BoxDecoration(
+                                          color: active,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        )),
                                     Container(
                                         height: 20,
                                         decoration: BoxDecoration(

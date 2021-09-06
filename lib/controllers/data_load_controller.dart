@@ -31,8 +31,7 @@ class DataLoadController extends GetxController {
       actions.reversed.forEach((element) {
         m_value += element['profit'];
         var date = DateTime.parse(element['date']);
-        wallet_history.add(
-            {'date': date.millisecondsSinceEpoch.toDouble(), 'value': m_value});
+        wallet_history.add({'date': date, 'value': m_value});
       });
     }
 
