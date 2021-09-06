@@ -1,4 +1,5 @@
 import 'package:crabs_trade/constants/style.dart';
+import 'package:crabs_trade/controllers/data_load_controller.dart';
 import 'package:crabs_trade/helpers/main_navigation.dart';
 import 'package:crabs_trade/helpers/session_model.dart';
 import 'package:crabs_trade/widgets/auth/auth_model.dart';
@@ -6,9 +7,11 @@ import 'package:crabs_trade/widgets/auth/auth_widget.dart';
 import 'package:crabs_trade/widgets/errors/not_found_error_widget.dart';
 import 'package:crabs_trade/widgets/layouts/main_layout.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 void main() async {
   final sessionModel = SessionModel();
+  Get.put(DataLoadController());
   var isAuth = await sessionModel.checkAuth();
   runApp(MyApp(
     sessionModel: sessionModel,

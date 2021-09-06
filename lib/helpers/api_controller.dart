@@ -17,26 +17,30 @@ class ApiModel extends ChangeNotifier {
   List<dynamic>? _allActions;
   List<dynamic>? get allActions => _allActions;
 
-  Future<void> getTickers(BuildContext context) async {
+  Future<List> getTickers() async {
     _tikers =
         await _apiClient.getTickers(accessToken: _sessionData.getAccessToken());
     notifyListeners();
+    return _tikers ?? [];
   }
 
-  Future<void> getWallet(BuildContext context) async {
+  Future<List> getAllActions(int page) async {
+    _allActions = await _apiClient.getAllActions(
+        accessToken: _sessionData.getAccessToken(), page: page);
+    notifyListeners();
+    return _allActions ?? [];
+  }
+
+  Future<Map> getWallet() async {
     var wallet =
         await _apiClient.getWallet(accessToken: _sessionData.getAccessToken());
     if (wallet.containsKey('money')) {
       _walletMoney = wallet['money'];
       notifyListeners();
+      return wallet;
     }
     notifyListeners();
-  }
-
-  Future<void> getAllActions(BuildContext context, int page) async {
-    _allActions = await _apiClient.getAllActions(
-        accessToken: _sessionData.getAccessToken(), page: page);
-    notifyListeners();
+    return {};
   }
 }
 
