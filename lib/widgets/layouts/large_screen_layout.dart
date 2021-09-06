@@ -30,8 +30,7 @@ class LargeScreenLayout extends StatelessWidget {
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  child: ApiProvider(
-                      model: ApiModel(), child: localNavigator(route: route)),
+                  child: localNavigator(route: route),
                 ),
               ),
             ))

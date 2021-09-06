@@ -1,6 +1,7 @@
 import 'package:crabs_trade/constants/style.dart';
 import 'package:crabs_trade/controllers/data_load_controller.dart';
 import 'package:crabs_trade/helpers/custom_text.dart';
+import 'package:crabs_trade/helpers/responsiveness.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -14,48 +15,53 @@ class DashboardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        Center(child: Text('${c.count}')),
-        _Tickers(),
-        Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 4,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      // height: 100,
-                      // color: Colors.red,
-                      child: _WalletHistory(),
-                    )
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      // height: 100,
-                      // color: Colors.blue,
-                      child: _AllActions(),
-                    )
-                  ],
-                ),
-              )
-            ],
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          _Tickers(),
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: ResponsiveWidget.is_small_screen(context)
+                ? Column(
+                    children: [_WalletHistory(), _AllActions()],
+                  )
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 4,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              // height: 100,
+                              // color: Colors.red,
+                              child: _WalletHistory(),
+                            )
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              // height: 100,
+                              // color: Colors.blue,
+                              child: _AllActions(),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -92,7 +98,8 @@ class _Tickers extends StatelessWidget {
                   children: [
                     Container(
                       child: const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                         child: CustomText(
                           text: 'Tickers',
                           color: light,

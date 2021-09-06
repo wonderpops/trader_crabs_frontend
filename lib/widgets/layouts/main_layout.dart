@@ -51,7 +51,9 @@ class MainLayout extends StatelessWidget {
                     mediumScreen: LargeScreenLayout(
                       route: route,
                     ),
-                    smallScreen: SmallScreenLayout()),
+                    smallScreen: SmallScreenLayout(
+                      route: route,
+                    )),
               );
             } else {
               return AuthProvider(
