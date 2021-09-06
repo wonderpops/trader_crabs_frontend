@@ -1,3 +1,5 @@
+import 'dart:js';
+
 import 'package:crabs_trade/constants/style.dart';
 import 'package:crabs_trade/controllers/data_load_controller.dart';
 import 'package:crabs_trade/helpers/custom_text.dart';
@@ -10,62 +12,86 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
-class DashboardWidget extends StatelessWidget {
-  final DataLoadController c = Get.find();
+class DashboardWidget extends StatefulWidget {
   DashboardWidget({Key? key}) : super(key: key);
 
   @override
+  _DashboardWidgetState createState() => _DashboardWidgetState();
+}
+
+class _DashboardWidgetState extends State<DashboardWidget> {
+  final DataLoadController c = Get.find();
+
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
+
+  void _onRefresh() async {
+    // monitor network fetch
+    await c.load_tickers();
+    await c.load_actions();
+    await c.load_wallet_history();
+    // if failed,use refreshFailed()
+    _refreshController.refreshCompleted();
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          _Tickers(),
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: ResponsiveWidget.is_small_screen(context)
-                ? Column(
-                    children: [_WalletHistory(), _AllActions()],
-                  )
-                : Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 4,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              // height: 100,
-                              // color: Colors.red,
-                              child: Container(
-                                child: _WalletHistory(),
-                                // width: 700,
-                              ),
-                            )
-                          ],
+    return SmartRefresher(
+      controller: _refreshController,
+      onRefresh: _onRefresh,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            _Tickers(),
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: ResponsiveWidget.is_small_screen(context)
+                  ? Column(
+                      children: [_WalletHistory(), _AllActions()],
+                    )
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 4,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                // height: 100,
+                                // color: Colors.red,
+                                child: Container(
+                                  child: _WalletHistory(),
+                                  // width: 700,
+                                ),
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              // height: 100,
-                              // color: Colors.blue,
-                              child: _AllActions(),
-                            )
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-          ),
-        ],
+                        Expanded(
+                          flex: 2,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                // height: 100,
+                                // color: Colors.blue,
+                                child: _AllActions(),
+                              )
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -175,7 +201,7 @@ class _Tickers extends StatelessWidget {
         children: [
           Container(
             child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
               child: CustomText(
                 text: 'Tickers',
                 color: light,
@@ -446,8 +472,8 @@ class _WalletHistory extends StatelessWidget {
                               series: <SplineAreaSeries<WalletData, DateTime>>[
                                 SplineAreaSeries<WalletData, DateTime>(
                                     name: 'Money',
-                                    splineType: SplineType.cardinal,
-                                    color: active,
+                                    splineType: SplineType.monotonic,
+                                    color: active.withOpacity(.2),
                                     borderWidth: 4,
                                     markerSettings: const MarkerSettings(
                                         isVisible: true,
@@ -455,7 +481,7 @@ class _WalletHistory extends StatelessWidget {
                                         shape: DataMarkerType.diamond),
                                     borderGradient: const LinearGradient(
                                         colors: <Color>[
-                                          Color.fromRGBO(50, 140, 100, 1),
+                                          Color.fromRGBO(50, 40, 200, 1),
                                           Color.fromRGBO(50, 100, 240, 1)
                                         ],
                                         stops: <double>[
@@ -540,8 +566,8 @@ class _WalletHistory extends StatelessWidget {
                       series: <SplineAreaSeries<WalletData, DateTime>>[
                         SplineAreaSeries<WalletData, DateTime>(
                             name: 'Money',
-                            splineType: SplineType.cardinal,
-                            color: active,
+                            splineType: SplineType.monotonic,
+                            color: active.withOpacity(.2),
                             borderWidth: 4,
                             markerSettings: const MarkerSettings(
                                 isVisible: true,
@@ -549,7 +575,7 @@ class _WalletHistory extends StatelessWidget {
                                 shape: DataMarkerType.diamond),
                             borderGradient: const LinearGradient(
                                 colors: <Color>[
-                                  Color.fromRGBO(50, 140, 100, 1),
+                                  Color.fromRGBO(50, 40, 200, 1),
                                   Color.fromRGBO(50, 100, 240, 1)
                                 ],
                                 stops: <double>[

@@ -24,6 +24,7 @@ class DataLoadController extends GetxController {
   Future<List> load_wallet_history() async {
     wallet = await api.getWallet();
     actions = await api.getAllActions(1);
+    wallet_history = [];
 
     var m_value = 0.0;
 
