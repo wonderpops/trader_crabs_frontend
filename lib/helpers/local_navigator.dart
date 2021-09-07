@@ -2,7 +2,6 @@ import 'package:crabs_trade/constants/style.dart';
 import 'package:crabs_trade/helpers/main_navigation.dart';
 import 'package:crabs_trade/widgets/dashboard/dashboard.dart';
 import 'package:flutter/material.dart';
-
 import 'custom_text.dart';
 
 class localNavigator extends StatelessWidget {

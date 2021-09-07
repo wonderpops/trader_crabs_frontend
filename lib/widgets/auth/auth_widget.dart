@@ -50,7 +50,7 @@ class AuthForm extends StatelessWidget {
             ),
             Row(
               children: [
-                Text('SignIn',
+                Text('Sign In',
                     style: GoogleFonts.roboto(
                       color: light,
                       fontSize: 30,
@@ -61,7 +61,7 @@ class AuthForm extends StatelessWidget {
             Row(
               children: [
                 const CustomText(
-                  text: 'Welcome back to crab trade!',
+                  text: 'Welcome back to trader crabs!',
                   color: light_grey,
                 )
               ],
@@ -73,7 +73,7 @@ class AuthForm extends StatelessWidget {
               controller: model?.usernameTextController,
               style: const TextStyle(color: light),
               decoration: InputDecoration(
-                hintStyle: const TextStyle(color: light),
+                hintStyle: TextStyle(color: light.withOpacity(.4)),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20.0),
                     borderSide: const BorderSide(color: light)),
@@ -93,7 +93,7 @@ class AuthForm extends StatelessWidget {
               obscureText: true,
               style: const TextStyle(color: light),
               decoration: InputDecoration(
-                hintStyle: const TextStyle(color: light),
+                hintStyle: TextStyle(color: light.withOpacity(.4)),
                 fillColor: light,
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20.0),
@@ -104,7 +104,7 @@ class AuthForm extends StatelessWidget {
                 ),
                 counterStyle: const TextStyle(color: light),
                 labelText: 'Password',
-                hintText: 'mypass1234',
+                hintText: 'my_pass_1234',
                 focusColor: active,
               ),
             ),

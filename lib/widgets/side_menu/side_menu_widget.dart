@@ -77,7 +77,7 @@ class _SideMenuWidgetState extends State<SideMenuWidget> {
                       ),
                       const Flexible(
                           child: CustomText(
-                        text: 'Crabs Trade',
+                        text: 'Trader Crabs',
                         size: 20,
                         weight: FontWeight.bold,
                         color: light,

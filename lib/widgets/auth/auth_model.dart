@@ -50,7 +50,7 @@ class AuthModel extends ChangeNotifier {
       await Navigator.of(context)
           .pushReplacementNamed(MainNavigationRoutesNames.dashboard);
     } else {
-      _errorMessage = 'Unkown error, please try again :c';
+      _errorMessage = 'Unknown error, please try again :c';
       print(sessionKeys);
       _isAuthInProcess = false;
       notifyListeners();

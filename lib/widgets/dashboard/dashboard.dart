@@ -1,12 +1,8 @@
-import 'dart:js';
-
 import 'package:crabs_trade/constants/style.dart';
 import 'package:crabs_trade/controllers/data_load_controller.dart';
 import 'package:crabs_trade/helpers/custom_text.dart';
 import 'package:crabs_trade/helpers/responsiveness.dart';
 import 'package:data_table_2/data_table_2.dart';
-
-// import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';

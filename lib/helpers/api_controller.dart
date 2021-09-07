@@ -8,8 +8,8 @@ class ApiModel extends ChangeNotifier {
   final _apiClient = ApiClient();
   final _sessionData = SessionDataProvider();
 
-  List<dynamic>? _tikers;
-  List<dynamic>? get tikers => _tikers;
+  List<dynamic>? _tickers;
+  List<dynamic>? get tickers => _tickers;
 
   int? _walletMoney;
   int? get walletMoney => _walletMoney;
@@ -18,10 +18,10 @@ class ApiModel extends ChangeNotifier {
   List<dynamic>? get allActions => _allActions;
 
   Future<List> getTickers() async {
-    _tikers =
+    _tickers =
         await _apiClient.getTickers(accessToken: _sessionData.getAccessToken());
     notifyListeners();
-    return _tikers ?? [];
+    return _tickers ?? [];
   }
 
   Future<List> getAllActions(int page) async {

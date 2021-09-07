@@ -1,5 +1,4 @@
 import 'package:crabs_trade/constants/style.dart';
-import 'package:crabs_trade/helpers/api_controller.dart';
 import 'package:crabs_trade/helpers/local_navigator.dart';
 import 'package:crabs_trade/widgets/side_menu/side_menu_widget.dart';
 import 'package:flutter/material.dart';

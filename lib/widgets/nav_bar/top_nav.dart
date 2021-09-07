@@ -25,7 +25,7 @@ AppBar topNavBar(BuildContext context, GlobalKey<ScaffoldState> key) => AppBar(
         children: [
           const Visibility(
               child: CustomText(
-            text: 'Crab Trade',
+            text: 'Trader Crabs',
             color: light,
             size: 20,
             weight: FontWeight.bold,

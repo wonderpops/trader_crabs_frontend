@@ -18,13 +18,13 @@ class SessionModel {
         return _isAuth;
       } else {
         print('refreshing_tokens...');
-        final acessToken = await _apiClient.refreshTokens(
+        final accessToken = await _apiClient.refreshTokens(
             refreshToken: _sessionDataProvider.getRefreshToken());
 
-        if (acessToken.containsKey('access_token')) {
-          _sessionDataProvider.setAccessToken = acessToken['access_token'];
+        if (accessToken.containsKey('access_token')) {
+          _sessionDataProvider.setAccessToken = accessToken['access_token'];
           _sessionDataProvider.setExpiresAt =
-              acessToken['expires_at'].toString();
+              accessToken['expires_at'].toString();
           _isAuth = true;
         } else {
           _isAuth = false;
