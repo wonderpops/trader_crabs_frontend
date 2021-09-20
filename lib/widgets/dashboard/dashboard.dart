@@ -3,6 +3,7 @@ import 'package:crabs_trade/controllers/data_load_controller.dart';
 import 'package:crabs_trade/helpers/custom_text.dart';
 import 'package:crabs_trade/helpers/responsiveness.dart';
 import 'package:data_table_2/data_table_2.dart';
+import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -232,67 +233,96 @@ class _Ticker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final FluroRouter router = Get.find();
     return Padding(
       padding: const EdgeInsets.only(right: 10),
-      child: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: dark.withOpacity(.5),
-            boxShadow: [
-              BoxShadow(
-                color: data['profit'] > 0
-                    ? success.withOpacity(0.3)
-                    : data['profit'] < 0
-                        ? danger.withOpacity(0.3)
-                        : light_grey.withOpacity(0.3),
-                spreadRadius: 2,
-                blurRadius: 4,
-                offset: const Offset(0, 0),
-              ),
-            ]),
-        height: 80,
-        child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Container(
+      child: IntrinsicWidth(
+        child: Container(
+          height: 80,
+          child: Stack(
+            children: [
+              Container(
                 decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: dark.withOpacity(.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: data['profit'] > 0
+                            ? success.withOpacity(0.3)
+                            : data['profit'] < 0
+                                ? danger.withOpacity(0.3)
+                                : light_grey.withOpacity(0.3),
+                        spreadRadius: 2,
+                        blurRadius: 4,
+                        offset: const Offset(0, 0),
+                      ),
+                    ]),
+                height: 80,
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: data['profit'] > 0 ? success : danger,
+                        ),
+                        width: 60,
+                        height: 60,
+                        child: Center(
+                          child: CustomText(
+                            text: data['ticker'],
+                            size: 18,
+                            color: light,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 0, right: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CustomText(
+                            text: data['name'],
+                            color: light,
+                          ),
+                          CustomText(
+                            text: data['profit'].toString() + '\$',
+                            color: light,
+                          ),
+                          CustomText(
+                            text: data['status'],
+                            color: data['status'] == 'Selling'
+                                ? success
+                                : light_grey,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    router.navigateTo(context, '/tickers/' + data['ticker'],
+                        transition: TransitionType.fadeIn);
+                  },
+                  splashColor: light.withOpacity(.2),
+                  hoverColor: light.withOpacity(.2),
                   borderRadius: BorderRadius.circular(20),
-                  color: data['profit'] > 0 ? success : danger,
-                ),
-                width: 60,
-                height: 60,
-                child: Center(
-                  child: CustomText(
-                    text: data['ticker'],
-                    size: 18,
-                    color: light,
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: double.maxFinite,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 0, right: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CustomText(
-                    text: data['name'],
-                    color: light,
-                  ),
-                  CustomText(
-                    text: data['profit'].toString() + '\$',
-                    color: light,
-                  ),
-                  CustomText(
-                    text: data['status'],
-                    color: data['status'] == 'Selling' ? success : light_grey,
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

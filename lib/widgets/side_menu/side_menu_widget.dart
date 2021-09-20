@@ -1,7 +1,9 @@
 import 'package:crabs_trade/constants/style.dart';
 import 'package:crabs_trade/helpers/custom_text.dart';
 import 'package:crabs_trade/helpers/responsiveness.dart';
+import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SideMenuWidget extends StatefulWidget {
   final String route;
@@ -41,9 +43,9 @@ class _SideMenuWidgetState extends State<SideMenuWidget> {
       '/wallet',
     ),
     const MenuItem(
-      'Signout',
+      'Sign Out',
       Icons.exit_to_app,
-      '/auth',
+      '/signin',
     ),
   ];
 
@@ -130,6 +132,7 @@ class _SideMenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final FluroRouter router = Get.find();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
       child: Container(
@@ -173,7 +176,8 @@ class _SideMenuItem extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  Navigator.of(context).pushNamed(data.route);
+                  router.navigateTo(context, data.route,
+                      transition: TransitionType.fadeIn);
                 },
                 splashColor: (activeRoute == data.route)
                     ? Colors.transparent
