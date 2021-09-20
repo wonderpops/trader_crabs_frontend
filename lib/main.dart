@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       initialRoute: mainNavigation.initialRoute(isAuth),
-      title: 'Crabs trade',
+      title: 'Trader Crabs',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         accentColor: active,
