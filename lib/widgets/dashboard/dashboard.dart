@@ -484,7 +484,7 @@ class _WalletHistory extends StatelessWidget {
                         child: Container(
                           height: ResponsiveWidget.is_small_screen(context)
                               ? 300
-                              : 594,
+                              : 583,
                           width: double.maxFinite,
                           child: SfCartesianChart(
                               tooltipBehavior: TooltipBehavior(
@@ -578,7 +578,7 @@ class _WalletHistory extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-                  height: ResponsiveWidget.is_small_screen(context) ? 300 : 594,
+                  height: ResponsiveWidget.is_small_screen(context) ? 300 : 583,
                   width: double.maxFinite,
                   child: SfCartesianChart(
                       tooltipBehavior:
@@ -659,7 +659,7 @@ class _WalletHistoryShimmer extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                     height:
-                        ResponsiveWidget.is_small_screen(context) ? 340 : 634,
+                        ResponsiveWidget.is_small_screen(context) ? 340 : 623,
                     width: double.maxFinite,
                     child: Shimmer.fromColors(
                         baseColor: light.withOpacity(.2),
@@ -721,7 +721,7 @@ class _AllActions extends StatelessWidget {
                 children: [
                   Container(
                     height:
-                        ResponsiveWidget.is_small_screen(context) ? 300 : 720,
+                        ResponsiveWidget.is_small_screen(context) ? 300 : 712,
                     decoration: BoxDecoration(
                         color: dark, borderRadius: BorderRadius.circular(20)),
                     child: Padding(
@@ -827,7 +827,7 @@ class _AllActions extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         children: [
           Container(
-            height: ResponsiveWidget.is_small_screen(context) ? 340 : 720,
+            height: ResponsiveWidget.is_small_screen(context) ? 340 : 712,
             decoration: BoxDecoration(
                 color: dark, borderRadius: BorderRadius.circular(20)),
             child: Padding(
@@ -965,7 +965,7 @@ class _ActionsShimmer extends StatelessWidget {
                               color: light.withOpacity(.2),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            height: 637,
+                            height: 629,
                             child: Padding(
                               padding: const EdgeInsets.all(8),
                               child: Shimmer.fromColors(

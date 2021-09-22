@@ -39,6 +39,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         accentColor: active,
         primaryColor: active,
+        dividerColor: light.withOpacity(.2),
         primarySwatch: Colors.blue,
         inputDecorationTheme: const InputDecorationTheme(
           border: OutlineInputBorder(borderSide: BorderSide(color: light)),

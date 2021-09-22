@@ -1,5 +1,5 @@
 abstract class MainNavigationRoutesNames {
-  static const auth = '/auth';
+  static const auth = '/signin';
   static const dashboard = '/dashboard';
   static const tickers = '/tickers';
   static const wallet = '/wallet';

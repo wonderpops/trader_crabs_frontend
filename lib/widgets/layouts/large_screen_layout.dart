@@ -28,8 +28,10 @@ class LargeScreenLayout extends StatelessWidget {
                 ),
                 child: Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  child: localNavigator(route: route),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  child: Container(
+                      height: double.maxFinite,
+                      child: localNavigator(route: route)),
                 ),
               ),
             ))

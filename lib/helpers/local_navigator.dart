@@ -1,6 +1,7 @@
 import 'package:crabs_trade/constants/style.dart';
 import 'package:crabs_trade/helpers/main_navigation.dart';
 import 'package:crabs_trade/widgets/dashboard/dashboard.dart';
+import 'package:crabs_trade/widgets/tickers/tickers.dart';
 import 'package:flutter/material.dart';
 import 'custom_text.dart';
 
@@ -14,12 +15,7 @@ class localNavigator extends StatelessWidget {
       case MainNavigationRoutesNames.dashboard:
         return DashboardWidget();
       case MainNavigationRoutesNames.tickers:
-        return Container(
-            child: CustomText(
-          text: route,
-          color: active,
-          size: 20,
-        ));
+        return Tickers();
       case MainNavigationRoutesNames.wallet:
         return Container(
             child: CustomText(
