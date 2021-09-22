@@ -23,11 +23,10 @@ var tickersHandler = Handler(
 var tickerHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   print(params);
-  String? message = params['message']?.first;
-  String? colorHex = params['color_hex']?.first;
-  String? result = params['result']?.first;
-  Color color = Color(0xFFFFFFFF);
-  return MainLayout(route: '/tickers');
+  return MainLayout(
+    route: '/tickers',
+    ticker: params['name']?.first ?? '',
+  );
 });
 
 var walletHandler = Handler(

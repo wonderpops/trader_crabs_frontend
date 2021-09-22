@@ -13,8 +13,10 @@ class MainLayout extends StatelessWidget {
   final sessionModel = SessionModel();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   final String route;
+  final String ticker;
 
-  MainLayout({Key? key, required this.route}) : super(key: key);
+  MainLayout({Key? key, required this.route, this.ticker = ''})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -47,12 +49,15 @@ class MainLayout extends StatelessWidget {
                 body: ResponsiveWidget(
                     largeScreen: LargeScreenLayout(
                       route: route,
+                      ticker: ticker,
                     ),
                     mediumScreen: LargeScreenLayout(
                       route: route,
+                      ticker: ticker,
                     ),
                     smallScreen: SmallScreenLayout(
                       route: route,
+                      ticker: ticker,
                     )),
               );
             } else {

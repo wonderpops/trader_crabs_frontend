@@ -69,6 +69,47 @@ class ApiClient {
     }
   }
 
+  Future<Map> getTickerInfo(
+      {required String accessToken, required String ticker}) async {
+    final url = Uri.parse('$_host/get_instrument?ticker=$ticker');
+    final response = await _client.get(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    if (response.statusCode == 200) {
+      final json = convert.jsonDecode(response.body) as Map;
+      return json;
+    } else {
+      final json = convert.jsonDecode(response.body) as Map;
+      return {'error': json};
+    }
+  }
+
+  Future<Map> setTickerState(
+      {required String accessToken,
+      required String ticker,
+      required bool state}) async {
+    final url =
+        Uri.parse('$_host/set_instrument_state?ticker=$ticker&state=$state');
+    final response = await _client.post(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    if (response.statusCode == 200) {
+      final json = convert.jsonDecode(response.body) as Map;
+      return json;
+    } else {
+      final json = convert.jsonDecode(response.body) as Map;
+      return {'error': json};
+    }
+  }
+
   Future<Map<String, dynamic>> getWallet({
     required String accessToken,
   }) async {
@@ -94,6 +135,56 @@ class ApiClient {
     required int page,
   }) async {
     final url = Uri.parse('$_host/get_all_actions?page=$page');
+    final response = await _client.get(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    if (response.statusCode == 200) {
+      final json = convert.jsonDecode(response.body) as List<dynamic>;
+      return json;
+    } else {
+      final json = convert.jsonDecode(response.body) as List<dynamic>;
+      return [
+        {'error': json}
+      ];
+    }
+  }
+
+  Future<List<dynamic>> getTickerActions({
+    required String accessToken,
+    required String ticker,
+    required int page,
+  }) async {
+    final url =
+        Uri.parse('$_host/get_ticker_actions?ticker=$ticker&page=$page');
+    final response = await _client.get(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    if (response.statusCode == 200) {
+      final json = convert.jsonDecode(response.body) as List<dynamic>;
+      return json;
+    } else {
+      final json = convert.jsonDecode(response.body) as List<dynamic>;
+      return [
+        {'error': json}
+      ];
+    }
+  }
+
+  Future<List<dynamic>> getTickersData({
+    required String accessToken,
+    required String ticker,
+    required int page,
+  }) async {
+    final url =
+        Uri.parse('$_host/get_instrument_data?ticker=$ticker&page=$page');
     final response = await _client.get(
       url,
       headers: {

@@ -24,11 +24,41 @@ class ApiModel extends ChangeNotifier {
     return _tickers ?? [];
   }
 
+  Future<Map> getTickerInfo(ticker) async {
+    var _ticker = await _apiClient.getTickerInfo(
+        accessToken: _sessionData.getAccessToken(), ticker: ticker);
+    notifyListeners();
+    return _ticker;
+  }
+
+  Future<Map> setTickerState(ticker, bool state) async {
+    var _ticker = await _apiClient.setTickerState(
+        accessToken: _sessionData.getAccessToken(),
+        ticker: ticker,
+        state: state);
+    notifyListeners();
+    return _ticker;
+  }
+
+  Future<List> getTickerData(ticker, int page) async {
+    var _tickerData = await _apiClient.getTickersData(
+        accessToken: _sessionData.getAccessToken(), ticker: ticker, page: page);
+    notifyListeners();
+    return _tickerData;
+  }
+
   Future<List> getAllActions(int page) async {
     _allActions = await _apiClient.getAllActions(
         accessToken: _sessionData.getAccessToken(), page: page);
     notifyListeners();
     return _allActions ?? [];
+  }
+
+  Future<List> getTickerActions(ticker, int page) async {
+    var _actions = await _apiClient.getTickerActions(
+        accessToken: _sessionData.getAccessToken(), ticker: ticker, page: page);
+    notifyListeners();
+    return _actions;
   }
 
   Future<Map> getWallet() async {

@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 
 class LargeScreenLayout extends StatelessWidget {
   final String route;
-  const LargeScreenLayout({Key? key, required this.route}) : super(key: key);
+  final String ticker;
+  const LargeScreenLayout({Key? key, required this.route, this.ticker = ''})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,10 @@ class LargeScreenLayout extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   child: Container(
                       height: double.maxFinite,
-                      child: localNavigator(route: route)),
+                      child: localNavigator(
+                        route: route,
+                        ticker: ticker,
+                      )),
                 ),
               ),
             ))
