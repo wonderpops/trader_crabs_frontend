@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class TickerInfo extends StatefulWidget {
   final String ticker;
@@ -202,15 +203,20 @@ class TickerActionData {
   final double action;
 }
 
-class _TickerHistory extends StatelessWidget {
+class _TickerHistory extends StatefulWidget {
   final String ticker;
   _TickerHistory({Key? key, required this.ticker}) : super(key: key);
 
   @override
+  State<_TickerHistory> createState() => _TickerHistoryState();
+}
+
+class _TickerHistoryState extends State<_TickerHistory> {
+  @override
   Widget build(BuildContext context) {
     final DataLoadController c = Get.find();
 
-    if (c.ticker_history.isEmpty || c.ticker_info['ticker'] != ticker) {
+    if (c.ticker_history.isEmpty || c.ticker_info['ticker'] != widget.ticker) {
       return FutureBuilder(
         builder: (ctx, snapshot) {
           if (snapshot.hasError) {
@@ -260,13 +266,123 @@ class _TickerHistory extends StatelessWidget {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: CustomText(
-                          text: 'Profit: ' +
-                              c.ticker_info['profit'].toString() +
-                              '\$',
-                          color: active,
-                          size: 20,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomText(
+                              text: 'Profit: ' +
+                                  c.ticker_info['profit'].toString() +
+                                  '\$',
+                              color: active,
+                              size: 20,
+                            ),
+                            Material(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(4),
+                              child: IconButton(
+                                  onPressed: () {
+                                    // showDatePicker(
+                                    //     context: context,
+                                    //     initialDate: DateTime.now(),
+                                    //     firstDate: DateTime.now()
+                                    //         .subtract(const Duration(days: 4)),
+                                    //     lastDate: DateTime.now()
+                                    //         .add(const Duration(days: 3)));
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return Center(
+                                            child: Container(
+                                              height: 400,
+                                              width: 400,
+                                              color: dark_light,
+                                              child: SfDateRangePicker(
+                                                onSelectionChanged: (date) {},
+                                                onSubmit: (Object value) async {
+                                                  if (value
+                                                      is PickerDateRange) {
+                                                    var start_date = value
+                                                        .startDate!
+                                                        .add(const Duration(
+                                                            days: 1));
+                                                    ;
+                                                    var end_date =
+                                                        value.endDate;
+                                                    if (end_date == null) {
+                                                      end_date = start_date.add(
+                                                          const Duration(
+                                                              days: 1));
+                                                    } else {
+                                                      end_date = end_date.add(
+                                                          const Duration(
+                                                              days: 1));
+                                                    }
+                                                    await c.load_ticker_history(
+                                                        widget.ticker,
+                                                        start_date.toUtc(),
+                                                        end_date.toUtc());
+                                                    Navigator.of(context).pop();
+                                                    setState(() {});
+                                                  } else {
+                                                    Navigator.of(context).pop();
+                                                    setState(() {});
+                                                  }
+                                                },
+                                                onCancel: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                showActionButtons: true,
+                                                headerStyle:
+                                                    const DateRangePickerHeaderStyle(
+                                                        textStyle: TextStyle(
+                                                            color: light)),
+                                                selectionTextStyle:
+                                                    const TextStyle(
+                                                        color: light),
+                                                rangeTextStyle: const TextStyle(
+                                                    color: light),
+                                                yearCellStyle:
+                                                    const DateRangePickerYearCellStyle(
+                                                        leadingDatesTextStyle:
+                                                            TextStyle(
+                                                                color: light),
+                                                        textStyle: TextStyle(
+                                                            color: light)),
+                                                monthCellStyle:
+                                                    const DateRangePickerMonthCellStyle(
+                                                        leadingDatesTextStyle:
+                                                            TextStyle(
+                                                                color: light),
+                                                        blackoutDateTextStyle:
+                                                            TextStyle(
+                                                                color: light),
+                                                        weekendTextStyle:
+                                                            TextStyle(
+                                                                color: light),
+                                                        textStyle: TextStyle(
+                                                            color: light)),
+                                                selectionMode:
+                                                    DateRangePickerSelectionMode
+                                                        .range,
+                                                initialSelectedRange:
+                                                    PickerDateRange(
+                                                        DateTime.now(),
+                                                        DateTime.now()),
+                                              ),
+                                            ),
+                                          );
+                                        });
+                                  },
+                                  splashRadius: 20,
+                                  splashColor: light.withOpacity(.2),
+                                  hoverColor: light.withOpacity(.2),
+                                  icon: const Icon(
+                                    Icons.date_range_rounded,
+                                    color: active,
+                                  )),
+                            ),
+                          ],
                         ),
                       ),
                       Padding(
@@ -401,7 +517,10 @@ class _TickerHistory extends StatelessWidget {
           }
           return const _TickerHistoryShimmer();
         },
-        future: c.load_ticker_history(ticker, 1),
+        future: c.load_ticker_history(
+            widget.ticker,
+            DateTime.now().subtract(const Duration(days: 1)).toUtc(),
+            DateTime.now().toUtc()),
       );
     }
 
@@ -444,11 +563,105 @@ class _TickerHistory extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CustomText(
-                  text: 'Profit: ' + c.ticker_info['profit'].toString() + '\$',
-                  color: active,
-                  size: 20,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CustomText(
+                      text: 'Profit: ' +
+                          c.ticker_info['profit'].toString() +
+                          '\$',
+                      color: active,
+                      size: 20,
+                    ),
+                    Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(4),
+                      child: IconButton(
+                          onPressed: () {
+                            // showDatePicker(
+                            //     context: context,
+                            //     initialDate: DateTime.now(),
+                            //     firstDate: DateTime.now()
+                            //         .subtract(const Duration(days: 4)),
+                            //     lastDate: DateTime.now()
+                            //         .add(const Duration(days: 3)));
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return Center(
+                                    child: Container(
+                                      height: 400,
+                                      width: 400,
+                                      color: dark_light,
+                                      child: SfDateRangePicker(
+                                        onSelectionChanged: (date) {},
+                                        onSubmit: (Object value) async {
+                                          if (value is PickerDateRange) {
+                                            var start_date = value.startDate!
+                                                .add(const Duration(days: 1));
+                                            ;
+                                            var end_date = value.endDate;
+                                            if (end_date == null) {
+                                              end_date = start_date
+                                                  .add(const Duration(days: 1));
+                                            } else {
+                                              end_date = end_date
+                                                  .add(const Duration(days: 1));
+                                            }
+                                            await c.load_ticker_history(
+                                                widget.ticker,
+                                                start_date.toUtc(),
+                                                end_date.toUtc());
+                                            Navigator.of(context).pop();
+                                            setState(() {});
+                                          } else {
+                                            Navigator.of(context).pop();
+                                            setState(() {});
+                                          }
+                                        },
+                                        onCancel: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        showActionButtons: true,
+                                        headerStyle:
+                                            const DateRangePickerHeaderStyle(
+                                                textStyle:
+                                                    TextStyle(color: light)),
+                                        selectionTextStyle:
+                                            const TextStyle(color: light),
+                                        rangeTextStyle:
+                                            const TextStyle(color: light),
+                                        yearCellStyle:
+                                            const DateRangePickerYearCellStyle(
+                                                textStyle:
+                                                    TextStyle(color: light)),
+                                        monthCellStyle:
+                                            const DateRangePickerMonthCellStyle(
+                                                blackoutDateTextStyle:
+                                                    TextStyle(color: light),
+                                                weekendTextStyle:
+                                                    TextStyle(color: light),
+                                                textStyle:
+                                                    TextStyle(color: light)),
+                                        selectionMode:
+                                            DateRangePickerSelectionMode.range,
+                                        initialSelectedRange: PickerDateRange(
+                                            DateTime.now(), DateTime.now()),
+                                      ),
+                                    ),
+                                  );
+                                });
+                          },
+                          splashRadius: 20,
+                          splashColor: light.withOpacity(.2),
+                          hoverColor: light.withOpacity(.2),
+                          icon: const Icon(
+                            Icons.date_range_rounded,
+                            color: active,
+                          )),
+                    ),
+                  ],
                 ),
               ),
               Padding(

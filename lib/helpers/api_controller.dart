@@ -40,9 +40,12 @@ class ApiModel extends ChangeNotifier {
     return _ticker;
   }
 
-  Future<List> getTickerData(ticker, int page) async {
+  Future<List> getTickerData(ticker, start_date, end_date) async {
     var _tickerData = await _apiClient.getTickersData(
-        accessToken: _sessionData.getAccessToken(), ticker: ticker, page: page);
+        accessToken: _sessionData.getAccessToken(),
+        ticker: ticker,
+        start_date: start_date,
+        end_date: end_date);
     notifyListeners();
     return _tickerData;
   }
@@ -54,9 +57,12 @@ class ApiModel extends ChangeNotifier {
     return _allActions ?? [];
   }
 
-  Future<List> getTickerActions(ticker, int page) async {
+  Future<List> getTickerActions(ticker, start_date, end_date) async {
     var _actions = await _apiClient.getTickerActions(
-        accessToken: _sessionData.getAccessToken(), ticker: ticker, page: page);
+        accessToken: _sessionData.getAccessToken(),
+        ticker: ticker,
+        start_date: start_date,
+        end_date: end_date);
     notifyListeners();
     return _actions;
   }

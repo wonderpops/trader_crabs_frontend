@@ -158,10 +158,16 @@ class ApiClient {
   Future<List<dynamic>> getTickerActions({
     required String accessToken,
     required String ticker,
-    required int page,
+    start_date,
+    end_date,
   }) async {
-    final url =
-        Uri.parse('$_host/get_ticker_actions?ticker=$ticker&page=$page');
+    var url;
+    if (start_date != null && end_date != null) {
+      url = Uri.parse(
+          '$_host/get_ticker_actions?ticker=$ticker&start_date=$start_date&end_date=$end_date');
+    } else {
+      url = Uri.parse('$_host/get_ticker_actions?ticker=$ticker');
+    }
     final response = await _client.get(
       url,
       headers: {
@@ -183,10 +189,11 @@ class ApiClient {
   Future<List<dynamic>> getTickersData({
     required String accessToken,
     required String ticker,
-    required int page,
+    required DateTime start_date,
+    required DateTime end_date,
   }) async {
-    final url =
-        Uri.parse('$_host/get_instrument_data?ticker=$ticker&page=$page');
+    final url = Uri.parse(
+        '$_host/get_instrument_data?ticker=$ticker&start_date=$start_date&end_date=$end_date');
     final response = await _client.get(
       url,
       headers: {

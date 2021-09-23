@@ -38,7 +38,7 @@ class DataLoadController extends GetxController {
   }
 
   Future<List> load_ticker_actions(ticker, page) async {
-    ticker_actions = await api.getTickerActions(ticker, page);
+    ticker_actions = await api.getTickerActions(ticker, null, null);
     print('ticker actions loaded');
     return ticker_actions;
   }
@@ -62,10 +62,11 @@ class DataLoadController extends GetxController {
     return wallet_history;
   }
 
-  Future<List> load_ticker_actions_history(ticker, page) async {
+  Future<List> load_ticker_actions_history(ticker, start_date, end_date) async {
     ticker_actions_sell_history = [];
     ticker_actions_buy_history = [];
-    actions = await api.getTickerActions(ticker, page);
+
+    actions = await api.getTickerActions(ticker, start_date, end_date);
     print('ticker actions loaded');
     if (actions.isNotEmpty) {
       actions.reversed.forEach((element) {
@@ -82,10 +83,10 @@ class DataLoadController extends GetxController {
     return actions;
   }
 
-  Future<List> load_ticker_history(ticker, page) async {
+  Future<List> load_ticker_history(ticker, start_date, end_date) async {
     ticker_history = [];
 
-    ticker_data = await api.getTickerData(ticker, page);
+    ticker_data = await api.getTickerData(ticker, start_date, end_date);
 
     if (ticker_data.isNotEmpty) {
       ticker_data.reversed.forEach((element) {
@@ -100,7 +101,7 @@ class DataLoadController extends GetxController {
     }
 
     print('ticker history loaded');
-    await load_ticker_actions_history(ticker, page);
+    await load_ticker_actions_history(ticker, start_date, end_date);
     return ticker_history;
   }
 }
