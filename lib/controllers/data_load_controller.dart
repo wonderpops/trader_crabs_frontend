@@ -8,6 +8,8 @@ class DataLoadController extends GetxController {
   List actions = [].obs;
   List ticker_data = [].obs;
   List ticker_actions = [].obs;
+  List ticker_actions_sell_history = [].obs;
+  List ticker_actions_buy_history = [].obs;
   List wallet_history = [].obs;
   List ticker_history = [].obs;
   Map wallet = {}.obs;
@@ -60,6 +62,26 @@ class DataLoadController extends GetxController {
     return wallet_history;
   }
 
+  Future<List> load_ticker_actions_history(ticker, page) async {
+    ticker_actions_sell_history = [];
+    ticker_actions_buy_history = [];
+    actions = await api.getTickerActions(ticker, page);
+    print('ticker actions loaded');
+    if (actions.isNotEmpty) {
+      actions.reversed.forEach((element) {
+        var date = DateTime.parse(element['date']);
+        if (element['action'] == 'Sell') {
+          ticker_actions_sell_history
+              .add({'date': date, 'value': element['price']});
+        } else {
+          ticker_actions_buy_history
+              .add({'date': date, 'value': element['price']});
+        }
+      });
+    }
+    return actions;
+  }
+
   Future<List> load_ticker_history(ticker, page) async {
     ticker_history = [];
 
@@ -78,6 +100,7 @@ class DataLoadController extends GetxController {
     }
 
     print('ticker history loaded');
+    await load_ticker_actions_history(ticker, page);
     return ticker_history;
   }
 }

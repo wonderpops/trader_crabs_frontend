@@ -196,6 +196,12 @@ class TickerData {
   final double d;
 }
 
+class TickerActionData {
+  TickerActionData(this.date, this.action);
+  final DateTime date;
+  final double action;
+}
+
 class _TickerHistory extends StatelessWidget {
   final String ticker;
   _TickerHistory({Key? key, required this.ticker}) : super(key: key);
@@ -219,6 +225,12 @@ class _TickerHistory extends StatelessWidget {
             final ticker_history = snapshot.data as List;
             var ticker_data = ticker_history
                 .map((e) => TickerData(e['date'], e['a'], e['k'], e['d']))
+                .toList();
+            var ticker_action_sell_data = c.ticker_actions_sell_history
+                .map((e) => TickerActionData(e['date'], e['value']))
+                .toList();
+            var ticker_action_buy_data = c.ticker_actions_buy_history
+                .map((e) => TickerActionData(e['date'], e['value']))
                 .toList();
             return Padding(
               padding: const EdgeInsets.only(right: 10),
@@ -274,18 +286,13 @@ class _TickerHistory extends StatelessWidget {
                                       enableMouseWheelZooming: true),
                                   primaryXAxis: DateTimeAxis(
                                       intervalType: DateTimeIntervalType.auto,
-                                      dateFormat: DateFormat.yMd()),
-                                  series: <
-                                      SplineAreaSeries<TickerData, DateTime>>[
+                                      dateFormat: DateFormat('yy-MM-dd hh:mm')),
+                                  series: <SplineAreaSeries<dynamic, DateTime>>[
                                     SplineAreaSeries<TickerData, DateTime>(
                                         name: 'Price',
                                         splineType: SplineType.monotonic,
                                         color: active.withOpacity(.2),
                                         borderWidth: 4,
-                                        markerSettings: const MarkerSettings(
-                                            isVisible: true,
-                                            // Marker shape is set to diamond
-                                            shape: DataMarkerType.diamond),
                                         borderGradient: const LinearGradient(
                                             colors: <Color>[
                                               Color.fromRGBO(50, 40, 200, 1),
@@ -299,7 +306,37 @@ class _TickerHistory extends StatelessWidget {
                                         xValueMapper: (TickerData action, _) =>
                                             action.date,
                                         yValueMapper: (TickerData action, _) =>
-                                            action.a)
+                                            action.a),
+                                    SplineAreaSeries<TickerActionData,
+                                            DateTime>(
+                                        name: 'Sell',
+                                        color: success.withOpacity(.0),
+                                        markerSettings: const MarkerSettings(
+                                            isVisible: true,
+                                            // Marker shape is set to diamond
+                                            shape: DataMarkerType.diamond),
+                                        dataSource: ticker_action_sell_data,
+                                        xValueMapper:
+                                            (TickerActionData action, _) =>
+                                                action.date,
+                                        yValueMapper:
+                                            (TickerActionData action, _) =>
+                                                action.action),
+                                    SplineAreaSeries<TickerActionData,
+                                            DateTime>(
+                                        name: 'Buy',
+                                        color: danger.withOpacity(.0),
+                                        markerSettings: const MarkerSettings(
+                                            isVisible: true,
+                                            // Marker shape is set to diamond
+                                            shape: DataMarkerType.diamond),
+                                        dataSource: ticker_action_buy_data,
+                                        xValueMapper:
+                                            (TickerActionData action, _) =>
+                                                action.date,
+                                        yValueMapper:
+                                            (TickerActionData action, _) =>
+                                                action.action)
                                   ]),
                               SfCartesianChart(
                                   tooltipBehavior: TooltipBehavior(
@@ -309,7 +346,7 @@ class _TickerHistory extends StatelessWidget {
                                       enableMouseWheelZooming: true),
                                   primaryXAxis: DateTimeAxis(
                                       intervalType: DateTimeIntervalType.auto,
-                                      dateFormat: DateFormat.yMd()),
+                                      dateFormat: DateFormat('yy-MM-dd hh:mm')),
                                   series: <LineSeries<TickerData, DateTime>>[
                                     LineSeries<TickerData, DateTime>(
                                         name: '%K',
@@ -373,6 +410,12 @@ class _TickerHistory extends StatelessWidget {
     var ticker_data = c.ticker_history
         .map((e) => TickerData(e['date'], e['a'], e['k'], e['d']))
         .toList();
+    var ticker_action_sell_data = c.ticker_actions_sell_history
+        .map((e) => TickerActionData(e['date'], e['value']))
+        .toList();
+    var ticker_action_buy_data = c.ticker_actions_buy_history
+        .map((e) => TickerActionData(e['date'], e['value']))
+        .toList();
     return Padding(
       padding: const EdgeInsets.only(right: 10),
       child: Container(
@@ -423,17 +466,13 @@ class _TickerHistory extends StatelessWidget {
                               enableMouseWheelZooming: true),
                           primaryXAxis: DateTimeAxis(
                               intervalType: DateTimeIntervalType.auto,
-                              dateFormat: DateFormat.yMd()),
-                          series: <SplineAreaSeries<TickerData, DateTime>>[
+                              dateFormat: DateFormat('yy-MM-dd hh:mm')),
+                          series: <SplineAreaSeries<dynamic, DateTime>>[
                             SplineAreaSeries<TickerData, DateTime>(
                                 name: 'Price',
                                 splineType: SplineType.monotonic,
                                 color: active.withOpacity(.2),
                                 borderWidth: 4,
-                                markerSettings: const MarkerSettings(
-                                    isVisible: true,
-                                    // Marker shape is set to diamond
-                                    shape: DataMarkerType.diamond),
                                 borderGradient: const LinearGradient(
                                     colors: <Color>[
                                       Color.fromRGBO(50, 40, 200, 1),
@@ -447,7 +486,31 @@ class _TickerHistory extends StatelessWidget {
                                 xValueMapper: (TickerData action, _) =>
                                     action.date,
                                 yValueMapper: (TickerData action, _) =>
-                                    action.a)
+                                    action.a),
+                            SplineAreaSeries<TickerActionData, DateTime>(
+                                name: 'Sell',
+                                color: success.withOpacity(.0),
+                                markerSettings: const MarkerSettings(
+                                    isVisible: true,
+                                    // Marker shape is set to diamond
+                                    shape: DataMarkerType.diamond),
+                                dataSource: ticker_action_sell_data,
+                                xValueMapper: (TickerActionData action, _) =>
+                                    action.date,
+                                yValueMapper: (TickerActionData action, _) =>
+                                    action.action),
+                            SplineAreaSeries<TickerActionData, DateTime>(
+                                name: 'Buy',
+                                color: danger.withOpacity(.0),
+                                markerSettings: const MarkerSettings(
+                                    isVisible: true,
+                                    // Marker shape is set to diamond
+                                    shape: DataMarkerType.diamond),
+                                dataSource: ticker_action_buy_data,
+                                xValueMapper: (TickerActionData action, _) =>
+                                    action.date,
+                                yValueMapper: (TickerActionData action, _) =>
+                                    action.action)
                           ]),
                       SfCartesianChart(
                           tooltipBehavior:
@@ -457,7 +520,7 @@ class _TickerHistory extends StatelessWidget {
                               enableMouseWheelZooming: true),
                           primaryXAxis: DateTimeAxis(
                               intervalType: DateTimeIntervalType.auto,
-                              dateFormat: DateFormat.yMd()),
+                              dateFormat: DateFormat('yy-MM-dd hh:mm')),
                           series: <LineSeries<TickerData, DateTime>>[
                             LineSeries<TickerData, DateTime>(
                                 name: '%K',
@@ -649,7 +712,7 @@ class _TickerActions extends StatelessWidget {
                                   minWidth: 300,
                                   columns: [
                                     const DataColumn2(
-                                      label: Text('Ticker',
+                                      label: Text('Date',
                                           style: TextStyle(color: active)),
                                       size: ColumnSize.L,
                                     ),
@@ -672,7 +735,10 @@ class _TickerActions extends StatelessWidget {
                                   rows: ticker_actions
                                       .map(
                                         (data) => DataRow(cells: [
-                                          DataCell(Text(data['ticker'])),
+                                          DataCell(Text(
+                                              DateFormat('yy-MM-dd hh:mm')
+                                                  .format(DateTime.parse(
+                                                      data['date'])))),
                                           DataCell(Text(
                                             data['action'],
                                             style: TextStyle(
@@ -753,8 +819,8 @@ class _TickerActions extends StatelessWidget {
                           minWidth: 300,
                           columns: [
                             const DataColumn2(
-                              label: Text('Ticker',
-                                  style: TextStyle(color: active)),
+                              label:
+                                  Text('Date', style: TextStyle(color: active)),
                               size: ColumnSize.L,
                             ),
                             const DataColumn2(
@@ -776,7 +842,8 @@ class _TickerActions extends StatelessWidget {
                           rows: c.ticker_actions
                               .map(
                                 (data) => DataRow(cells: [
-                                  DataCell(Text(data['ticker'])),
+                                  DataCell(Text(DateFormat('yy-MM-dd hh:mm')
+                                      .format(DateTime.parse(data['date'])))),
                                   DataCell(Text(
                                     data['action'],
                                     style: TextStyle(

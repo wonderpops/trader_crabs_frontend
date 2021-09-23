@@ -294,7 +294,8 @@ class _Ticker extends StatelessWidget {
                           ),
                           CustomText(
                             text: data['status'],
-                            color: data['status'] == 'Selling'
+                            color: data['status'] == 'Selling' ||
+                                    data['status'] == 'Buying'
                                 ? success
                                 : light_grey,
                           ),
@@ -701,7 +702,7 @@ class _AllActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DataLoadController c = Get.find();
-    if (c.actions.isEmpty) {
+    if (c.actions.isEmpty || c.ticker_info != {}) {
       return FutureBuilder(
         builder: (ctx, snapshot) {
           if (snapshot.hasError) {

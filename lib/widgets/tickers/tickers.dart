@@ -56,6 +56,11 @@ class Tickers extends StatelessWidget {
                       size: ColumnSize.L,
                     ),
                     const DataColumn2(
+                      label:
+                          Text('Is working', style: TextStyle(color: active)),
+                      size: ColumnSize.L,
+                    ),
+                    const DataColumn2(
                       label: Text('Status', style: TextStyle(color: active)),
                       size: ColumnSize.L,
                     ),
@@ -75,6 +80,11 @@ class Tickers extends StatelessWidget {
                             cells: [
                               DataCell(Text(data['name'])),
                               DataCell(Text(data['ticker'])),
+                              DataCell(Text(
+                                data['isOn'].toString(),
+                                style: TextStyle(
+                                    color: data['isOn'] ? success : light_grey),
+                              )),
                               DataCell(Text(data['status'])),
                               DataCell(Text(
                                 data['profit'].toString() + '\$',
