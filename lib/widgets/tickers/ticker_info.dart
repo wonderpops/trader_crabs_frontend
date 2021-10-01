@@ -234,6 +234,10 @@ class _TickerHistory extends StatefulWidget {
 }
 
 class _TickerHistoryState extends State<_TickerHistory> {
+  var start_date =
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  var end_date = DateTime(DateTime.now().year, DateTime.now().month,
+      DateTime.now().day, 23, 59, 59);
   @override
   Widget build(BuildContext context) {
     final DataLoadController c = Get.find();
@@ -291,7 +295,7 @@ class _TickerHistoryState extends State<_TickerHistory> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        padding: const EdgeInsets.only(left: 8, right: 8),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -302,101 +306,151 @@ class _TickerHistoryState extends State<_TickerHistory> {
                               color: active,
                               size: 20,
                             ),
-                            Material(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(4),
-                              child: IconButton(
-                                  onPressed: () {
-                                    // showDatePicker(
-                                    //     context: context,
-                                    //     initialDate: DateTime.now(),
-                                    //     firstDate: DateTime.now()
-                                    //         .subtract(const Duration(days: 4)),
-                                    //     lastDate: DateTime.now()
-                                    //         .add(const Duration(days: 3)));
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return Center(
-                                            child: Container(
-                                              height: 400,
-                                              width: 400,
-                                              color: dark_light,
-                                              child: SfDateRangePicker(
-                                                onSelectionChanged: (date) {},
-                                                onSubmit: (Object value) async {
-                                                  if (value
-                                                      is PickerDateRange) {
-                                                    var start_date =
-                                                        value.startDate!;
-                                                    var end_date =
-                                                        value.endDate ??
-                                                            start_date.add(
-                                                                const Duration(
-                                                                    days: 1));
-                                                    await c.load_ticker_history(
-                                                        widget.ticker,
-                                                        start_date.toUtc(),
-                                                        end_date.toUtc());
-                                                    Navigator.of(context).pop();
-                                                    setState(() {});
-                                                  } else {
-                                                    Navigator.of(context).pop();
-                                                    setState(() {});
-                                                  }
-                                                },
-                                                onCancel: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                                showActionButtons: true,
-                                                headerStyle:
-                                                    const DateRangePickerHeaderStyle(
-                                                        textStyle: TextStyle(
-                                                            color: light)),
-                                                selectionTextStyle:
-                                                    const TextStyle(
-                                                        color: light),
-                                                rangeTextStyle: const TextStyle(
-                                                    color: light),
-                                                yearCellStyle:
-                                                    const DateRangePickerYearCellStyle(
-                                                        leadingDatesTextStyle:
-                                                            TextStyle(
-                                                                color: light),
-                                                        textStyle: TextStyle(
-                                                            color: light)),
-                                                monthCellStyle:
-                                                    const DateRangePickerMonthCellStyle(
-                                                        leadingDatesTextStyle:
-                                                            TextStyle(
-                                                                color: light),
-                                                        blackoutDateTextStyle:
-                                                            TextStyle(
-                                                                color: light),
-                                                        weekendTextStyle:
-                                                            TextStyle(
-                                                                color: light),
-                                                        textStyle: TextStyle(
-                                                            color: light)),
-                                                selectionMode:
-                                                    DateRangePickerSelectionMode
-                                                        .range,
-                                                initialSelectedRange:
-                                                    PickerDateRange(
-                                                        DateTime.now(),
-                                                        DateTime.now()),
-                                              ),
-                                            ),
-                                          );
-                                        });
-                                  },
-                                  splashRadius: 20,
-                                  splashColor: light.withOpacity(.2),
-                                  hoverColor: light.withOpacity(.2),
-                                  icon: const Icon(
-                                    Icons.date_range_rounded,
-                                    color: active,
-                                  )),
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: dark_light,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: CustomText(
+                                        text: DateFormat('yy-MM-dd HH:mm')
+                                                .format(start_date)
+                                                .toString() +
+                                            '  /  ' +
+                                            DateFormat('yy-MM-dd HH:mm')
+                                                .format(end_date)
+                                                .toString(),
+                                        color: light),
+                                  ),
+                                  Material(
+                                    color: Colors.transparent,
+                                    borderRadius: BorderRadius.circular(4),
+                                    child: IconButton(
+                                        onPressed: () {
+                                          // showDatePicker(
+                                          //     context: context,
+                                          //     initialDate: DateTime.now(),
+                                          //     firstDate: DateTime.now()
+                                          //         .subtract(const Duration(days: 4)),
+                                          //     lastDate: DateTime.now()
+                                          //         .add(const Duration(days: 3)));
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return Center(
+                                                  child: Container(
+                                                    height: 400,
+                                                    width: 400,
+                                                    color: dark_light,
+                                                    child: SfDateRangePicker(
+                                                      onSelectionChanged:
+                                                          (date) {},
+                                                      onSubmit:
+                                                          (Object value) async {
+                                                        if (value
+                                                            is PickerDateRange) {
+                                                          start_date =
+                                                              value.startDate!;
+                                                          end_date = value
+                                                                      .endDate !=
+                                                                  null
+                                                              ? value.endDate!
+                                                                  .add(const Duration(
+                                                                      days: 1))
+                                                                  .subtract(
+                                                                      const Duration(
+                                                                          seconds:
+                                                                              1))
+                                                              : start_date
+                                                                  .add(const Duration(
+                                                                      days: 1))
+                                                                  .subtract(
+                                                                      const Duration(
+                                                                          seconds:
+                                                                              1));
+                                                          await c
+                                                              .load_ticker_history(
+                                                                  widget.ticker,
+                                                                  start_date
+                                                                      .toUtc(),
+                                                                  end_date
+                                                                      .toUtc());
+                                                          Navigator.of(context)
+                                                              .pop();
+
+                                                          setState(() {});
+                                                        } else {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                          setState(() {});
+                                                        }
+                                                      },
+                                                      onCancel: () {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      },
+                                                      showActionButtons: true,
+                                                      headerStyle:
+                                                          const DateRangePickerHeaderStyle(
+                                                              textStyle:
+                                                                  TextStyle(
+                                                                      color:
+                                                                          light)),
+                                                      selectionTextStyle:
+                                                          const TextStyle(
+                                                              color: light),
+                                                      rangeTextStyle:
+                                                          const TextStyle(
+                                                              color: light),
+                                                      yearCellStyle:
+                                                          const DateRangePickerYearCellStyle(
+                                                              leadingDatesTextStyle:
+                                                                  TextStyle(
+                                                                      color:
+                                                                          light),
+                                                              textStyle:
+                                                                  TextStyle(
+                                                                      color:
+                                                                          light)),
+                                                      monthCellStyle: const DateRangePickerMonthCellStyle(
+                                                          leadingDatesTextStyle:
+                                                              TextStyle(
+                                                                  color: light),
+                                                          blackoutDateTextStyle:
+                                                              TextStyle(
+                                                                  color: light),
+                                                          weekendTextStyle:
+                                                              TextStyle(
+                                                                  color: light),
+                                                          textStyle: TextStyle(
+                                                              color: light)),
+                                                      selectionMode:
+                                                          DateRangePickerSelectionMode
+                                                              .range,
+                                                      initialSelectedRange:
+                                                          PickerDateRange(
+                                                              start_date,
+                                                              end_date),
+                                                    ),
+                                                  ),
+                                                );
+                                              });
+                                        },
+                                        splashRadius: 20,
+                                        splashColor: light.withOpacity(.2),
+                                        hoverColor: light.withOpacity(.2),
+                                        icon: const Icon(
+                                          Icons.date_range_rounded,
+                                          color: active,
+                                        )),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -546,152 +600,162 @@ class _TickerHistoryState extends State<_TickerHistory> {
                             )
                           : Expanded(
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
                                 child: Container(
-                                  // height: ResponsiveWidget.is_small_screen(context)
-                                  //     ? 600
-                                  //     : 660,
                                   width: double.maxFinite,
                                   child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
                                     children: [
-                                      SfCartesianChart(
-                                          tooltipBehavior: TooltipBehavior(
-                                              enable: true,
-                                              format: 'point.y\$'),
-                                          zoomPanBehavior: ZoomPanBehavior(
-                                              enableSelectionZooming: true,
-                                              enableMouseWheelZooming: true),
-                                          primaryXAxis: DateTimeAxis(
-                                              intervalType:
-                                                  DateTimeIntervalType.auto,
-                                              dateFormat:
-                                                  DateFormat('yy-MM-dd hh:mm')),
-                                          series: <
-                                              SplineAreaSeries<dynamic,
-                                                  DateTime>>[
-                                            SplineAreaSeries<TickerData,
-                                                    DateTime>(
-                                                name: 'Price',
-                                                splineType:
-                                                    SplineType.monotonic,
-                                                color: active.withOpacity(.2),
-                                                borderWidth: 4,
-                                                borderGradient:
-                                                    const LinearGradient(
-                                                        colors: <Color>[
-                                                      Color.fromRGBO(
-                                                          50, 40, 200, 1),
-                                                      Color.fromRGBO(
-                                                          50, 100, 240, 1)
-                                                    ],
-                                                        stops: <double>[
-                                                      0.2,
-                                                      0.9
-                                                    ]),
-                                                dataSource: ticker_data,
-                                                xValueMapper:
-                                                    (TickerData action, _) =>
-                                                        action.date,
-                                                yValueMapper:
-                                                    (TickerData action, _) =>
-                                                        action.a),
-                                            SplineAreaSeries<TickerActionData,
-                                                    DateTime>(
-                                                name: 'Sell',
-                                                color: success.withOpacity(.0),
-                                                markerSettings:
-                                                    const MarkerSettings(
-                                                        isVisible: true,
-                                                        // Marker shape is set to diamond
-                                                        shape: DataMarkerType
-                                                            .diamond),
-                                                dataSource:
-                                                    ticker_action_sell_data,
-                                                xValueMapper:
-                                                    (TickerActionData action,
-                                                            _) =>
-                                                        action.date,
-                                                yValueMapper:
-                                                    (TickerActionData action,
-                                                            _) =>
-                                                        action.action),
-                                            SplineAreaSeries<TickerActionData,
-                                                    DateTime>(
-                                                name: 'Buy',
-                                                color: danger.withOpacity(.0),
-                                                markerSettings:
-                                                    const MarkerSettings(
-                                                        isVisible: true,
-                                                        // Marker shape is set to diamond
-                                                        shape: DataMarkerType
-                                                            .diamond),
-                                                dataSource:
-                                                    ticker_action_buy_data,
-                                                xValueMapper:
-                                                    (TickerActionData action,
-                                                            _) =>
-                                                        action.date,
-                                                yValueMapper:
-                                                    (TickerActionData action,
-                                                            _) =>
-                                                        action.action)
-                                          ]),
-                                      SfCartesianChart(
-                                          tooltipBehavior: TooltipBehavior(
-                                              enable: true, format: 'point.y%'),
-                                          zoomPanBehavior: ZoomPanBehavior(
-                                              enableSelectionZooming: true,
-                                              enableMouseWheelZooming: true),
-                                          primaryXAxis: DateTimeAxis(
-                                              intervalType:
-                                                  DateTimeIntervalType.auto,
-                                              dateFormat:
-                                                  DateFormat('yy-MM-dd hh:mm')),
-                                          series: <
-                                              LineSeries<TickerData, DateTime>>[
-                                            LineSeries<TickerData, DateTime>(
-                                                name: '%K',
-                                                color: Colors.orange
-                                                    .withOpacity(.4),
-                                                dataSource: ticker_data,
-                                                xValueMapper:
-                                                    (TickerData action, _) =>
-                                                        action.date,
-                                                yValueMapper:
-                                                    (TickerData action, _) =>
-                                                        action.k),
-                                            LineSeries<TickerData, DateTime>(
-                                                name: '%D',
-                                                color:
-                                                    Colors.blue.withOpacity(.4),
-                                                dataSource: ticker_data,
-                                                xValueMapper:
-                                                    (TickerData action, _) =>
-                                                        action.date,
-                                                yValueMapper:
-                                                    (TickerData action, _) =>
-                                                        action.d),
-                                            LineSeries<TickerData, DateTime>(
-                                                name: '90%',
-                                                color: success.withOpacity(.4),
-                                                dataSource: ticker_data,
-                                                xValueMapper:
-                                                    (TickerData action, _) =>
-                                                        action.date,
-                                                yValueMapper:
-                                                    (TickerData action, _) =>
-                                                        90),
-                                            LineSeries<TickerData, DateTime>(
-                                                name: '10%',
-                                                color: success.withOpacity(.4),
-                                                dataSource: ticker_data,
-                                                xValueMapper:
-                                                    (TickerData action, _) =>
-                                                        action.date,
-                                                yValueMapper:
-                                                    (TickerData action, _) =>
-                                                        10),
-                                          ])
+                                      Expanded(
+                                        flex: 2,
+                                        child: SfCartesianChart(
+                                            tooltipBehavior: TooltipBehavior(
+                                                enable: true,
+                                                format: 'point.y\$'),
+                                            zoomPanBehavior: ZoomPanBehavior(
+                                                enableSelectionZooming: true,
+                                                enableMouseWheelZooming: true),
+                                            primaryXAxis: DateTimeAxis(
+                                                intervalType:
+                                                    DateTimeIntervalType.auto,
+                                                dateFormat: DateFormat(
+                                                    'yy-MM-dd hh:mm')),
+                                            series: <
+                                                SplineAreaSeries<dynamic,
+                                                    DateTime>>[
+                                              SplineAreaSeries<TickerData,
+                                                      DateTime>(
+                                                  name: 'Price',
+                                                  splineType:
+                                                      SplineType.monotonic,
+                                                  color: active.withOpacity(.2),
+                                                  borderWidth: 4,
+                                                  borderGradient:
+                                                      const LinearGradient(
+                                                          colors: <Color>[
+                                                        Color.fromRGBO(
+                                                            50, 40, 200, 1),
+                                                        Color.fromRGBO(
+                                                            50, 100, 240, 1)
+                                                      ],
+                                                          stops: <double>[
+                                                        0.2,
+                                                        0.9
+                                                      ]),
+                                                  dataSource: ticker_data,
+                                                  xValueMapper:
+                                                      (TickerData action, _) =>
+                                                          action.date,
+                                                  yValueMapper:
+                                                      (TickerData action, _) =>
+                                                          action.a),
+                                              SplineAreaSeries<TickerActionData,
+                                                      DateTime>(
+                                                  name: 'Sell',
+                                                  color:
+                                                      success.withOpacity(.0),
+                                                  markerSettings:
+                                                      const MarkerSettings(
+                                                          isVisible: true,
+                                                          // Marker shape is set to diamond
+                                                          shape: DataMarkerType
+                                                              .diamond),
+                                                  dataSource:
+                                                      ticker_action_sell_data,
+                                                  xValueMapper:
+                                                      (TickerActionData action,
+                                                              _) =>
+                                                          action.date,
+                                                  yValueMapper:
+                                                      (TickerActionData action,
+                                                              _) =>
+                                                          action.action),
+                                              SplineAreaSeries<TickerActionData,
+                                                      DateTime>(
+                                                  name: 'Buy',
+                                                  color: danger.withOpacity(.0),
+                                                  markerSettings:
+                                                      const MarkerSettings(
+                                                          isVisible: true,
+                                                          // Marker shape is set to diamond
+                                                          shape: DataMarkerType
+                                                              .diamond),
+                                                  dataSource:
+                                                      ticker_action_buy_data,
+                                                  xValueMapper:
+                                                      (TickerActionData action,
+                                                              _) =>
+                                                          action.date,
+                                                  yValueMapper:
+                                                      (TickerActionData action,
+                                                              _) =>
+                                                          action.action)
+                                            ]),
+                                      ),
+                                      Expanded(
+                                        child: SfCartesianChart(
+                                            tooltipBehavior: TooltipBehavior(
+                                                enable: true,
+                                                format: 'point.y%'),
+                                            zoomPanBehavior: ZoomPanBehavior(
+                                                enableSelectionZooming: true,
+                                                enableMouseWheelZooming: true),
+                                            primaryXAxis: DateTimeAxis(
+                                                intervalType:
+                                                    DateTimeIntervalType.auto,
+                                                dateFormat: DateFormat(
+                                                    'yy-MM-dd hh:mm')),
+                                            series: <
+                                                LineSeries<TickerData,
+                                                    DateTime>>[
+                                              LineSeries<TickerData, DateTime>(
+                                                  name: '%K',
+                                                  color: Colors.orange
+                                                      .withOpacity(.4),
+                                                  dataSource: ticker_data,
+                                                  xValueMapper:
+                                                      (TickerData action, _) =>
+                                                          action.date,
+                                                  yValueMapper:
+                                                      (TickerData action, _) =>
+                                                          action.k),
+                                              LineSeries<TickerData, DateTime>(
+                                                  name: '%D',
+                                                  color: Colors.blue
+                                                      .withOpacity(.4),
+                                                  dataSource: ticker_data,
+                                                  xValueMapper:
+                                                      (TickerData action, _) =>
+                                                          action.date,
+                                                  yValueMapper:
+                                                      (TickerData action, _) =>
+                                                          action.d),
+                                              LineSeries<TickerData, DateTime>(
+                                                  name: '90%',
+                                                  color:
+                                                      success.withOpacity(.4),
+                                                  dataSource: ticker_data,
+                                                  xValueMapper:
+                                                      (TickerData action, _) =>
+                                                          action.date,
+                                                  yValueMapper:
+                                                      (TickerData action, _) =>
+                                                          90),
+                                              LineSeries<TickerData, DateTime>(
+                                                  name: '10%',
+                                                  color:
+                                                      success.withOpacity(.4),
+                                                  dataSource: ticker_data,
+                                                  xValueMapper:
+                                                      (TickerData action, _) =>
+                                                          action.date,
+                                                  yValueMapper:
+                                                      (TickerData action, _) =>
+                                                          10),
+                                            ]),
+                                      )
                                     ],
                                   ),
                                 ),
@@ -718,6 +782,7 @@ class _TickerHistoryState extends State<_TickerHistory> {
 
     // print(walletData.toString());
     //TODO don't calculate wallet_data while build
+    // ! Maybe that layout don't need
     var ticker_data = c.ticker_history
         .map((e) => TickerData(e['date'], e['a'], e['k'], e['d']))
         .toList();
@@ -756,100 +821,130 @@ class _TickerHistoryState extends State<_TickerHistory> {
                   color: light,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomText(
-                      text: 'Profit: ' +
-                          c.ticker_info['profit'].toString() +
-                          '\$',
-                      color: active,
-                      size: 20,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomText(
+                    text:
+                        'Profit: ' + c.ticker_info['profit'].toString() + '\$',
+                    color: active,
+                    size: 20,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: dark_light),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: CustomText(
+                              text: DateFormat('yy-MM-dd HH:mm')
+                                      .format(start_date)
+                                      .toString() +
+                                  '  /  ' +
+                                  DateFormat('yy-MM-dd HH:mm')
+                                      .format(end_date)
+                                      .toString(),
+                              color: light),
+                        ),
+                        Material(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(4),
+                          child: IconButton(
+                              onPressed: () {
+                                // showDatePicker(
+                                //     context: context,
+                                //     initialDate: DateTime.now(),
+                                //     firstDate: DateTime.now()
+                                //         .subtract(const Duration(days: 4)),
+                                //     lastDate: DateTime.now()
+                                //         .add(const Duration(days: 3)));
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return Center(
+                                        child: Container(
+                                          height: 400,
+                                          width: 400,
+                                          color: dark_light,
+                                          child: SfDateRangePicker(
+                                            onSelectionChanged: (date) {},
+                                            onSubmit: (Object value) async {
+                                              if (value is PickerDateRange) {
+                                                start_date = value.startDate!;
+                                                end_date = value.endDate != null
+                                                    ? value.endDate!
+                                                        .add(const Duration(
+                                                            days: 1))
+                                                        .subtract(
+                                                            const Duration(
+                                                                seconds: 1))
+                                                    : start_date
+                                                        .add(const Duration(
+                                                            days: 1))
+                                                        .subtract(
+                                                            const Duration(
+                                                                seconds: 1));
+                                                await c.load_ticker_history(
+                                                    widget.ticker,
+                                                    start_date.toUtc(),
+                                                    end_date.toUtc());
+                                                Navigator.of(context).pop();
+                                                setState(() {});
+                                              } else {
+                                                Navigator.of(context).pop();
+                                                setState(() {});
+                                              }
+                                            },
+                                            onCancel: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            showActionButtons: true,
+                                            headerStyle:
+                                                const DateRangePickerHeaderStyle(
+                                                    textStyle: TextStyle(
+                                                        color: light)),
+                                            selectionTextStyle:
+                                                const TextStyle(color: light),
+                                            rangeTextStyle:
+                                                const TextStyle(color: light),
+                                            yearCellStyle:
+                                                const DateRangePickerYearCellStyle(
+                                                    textStyle: TextStyle(
+                                                        color: light)),
+                                            monthCellStyle:
+                                                const DateRangePickerMonthCellStyle(
+                                                    blackoutDateTextStyle:
+                                                        TextStyle(color: light),
+                                                    weekendTextStyle:
+                                                        TextStyle(color: light),
+                                                    textStyle: TextStyle(
+                                                        color: light)),
+                                            selectionMode:
+                                                DateRangePickerSelectionMode
+                                                    .range,
+                                            initialSelectedRange:
+                                                PickerDateRange(
+                                                    start_date, end_date),
+                                          ),
+                                        ),
+                                      );
+                                    });
+                              },
+                              splashRadius: 20,
+                              splashColor: light.withOpacity(.2),
+                              hoverColor: light.withOpacity(.2),
+                              icon: const Icon(
+                                Icons.date_range_rounded,
+                                color: active,
+                              )),
+                        ),
+                      ],
                     ),
-                    Material(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(4),
-                      child: IconButton(
-                          onPressed: () {
-                            // showDatePicker(
-                            //     context: context,
-                            //     initialDate: DateTime.now(),
-                            //     firstDate: DateTime.now()
-                            //         .subtract(const Duration(days: 4)),
-                            //     lastDate: DateTime.now()
-                            //         .add(const Duration(days: 3)));
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return Center(
-                                    child: Container(
-                                      height: 400,
-                                      width: 400,
-                                      color: dark_light,
-                                      child: SfDateRangePicker(
-                                        onSelectionChanged: (date) {},
-                                        onSubmit: (Object value) async {
-                                          if (value is PickerDateRange) {
-                                            var start_date = value.startDate!;
-                                            var end_date = value.endDate ??
-                                                start_date.add(
-                                                    const Duration(days: 1));
-                                            await c.load_ticker_history(
-                                                widget.ticker,
-                                                start_date.toUtc(),
-                                                end_date.toUtc());
-                                            Navigator.of(context).pop();
-                                            setState(() {});
-                                          } else {
-                                            Navigator.of(context).pop();
-                                            setState(() {});
-                                          }
-                                        },
-                                        onCancel: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        showActionButtons: true,
-                                        headerStyle:
-                                            const DateRangePickerHeaderStyle(
-                                                textStyle:
-                                                    TextStyle(color: light)),
-                                        selectionTextStyle:
-                                            const TextStyle(color: light),
-                                        rangeTextStyle:
-                                            const TextStyle(color: light),
-                                        yearCellStyle:
-                                            const DateRangePickerYearCellStyle(
-                                                textStyle:
-                                                    TextStyle(color: light)),
-                                        monthCellStyle:
-                                            const DateRangePickerMonthCellStyle(
-                                                blackoutDateTextStyle:
-                                                    TextStyle(color: light),
-                                                weekendTextStyle:
-                                                    TextStyle(color: light),
-                                                textStyle:
-                                                    TextStyle(color: light)),
-                                        selectionMode:
-                                            DateRangePickerSelectionMode.range,
-                                        initialSelectedRange: PickerDateRange(
-                                            DateTime.now(), DateTime.now()),
-                                      ),
-                                    ),
-                                  );
-                                });
-                          },
-                          splashRadius: 20,
-                          splashColor: light.withOpacity(.2),
-                          hoverColor: light.withOpacity(.2),
-                          icon: const Icon(
-                            Icons.date_range_rounded,
-                            color: active,
-                          )),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               ResponsiveWidget.is_small_screen(context)
                   ? Padding(
