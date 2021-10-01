@@ -39,57 +39,61 @@ class _DashboardWidgetState extends State<DashboardWidget> {
     return SmartRefresher(
       controller: _refreshController,
       onRefresh: _onRefresh,
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            _Tickers(),
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: ResponsiveWidget.is_small_screen(context)
-                  ? Column(
-                      children: [_WalletHistory(), _AllActions()],
-                    )
-                  : Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 4,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                // height: 100,
-                                // color: Colors.red,
-                                child: Container(
-                                  child: _WalletHistory(),
-                                  // width: 700,
-                                ),
-                              )
-                            ],
+      child: ResponsiveWidget.is_small_screen(context)
+          ? SingleChildScrollView(
+              child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [_Tickers(), _WalletHistory(), _AllActions()],
+            ))
+          : SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _Tickers(),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            flex: 4,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    // height: double.infinity,
+                                    // color: Colors.red,
+                                    child: _WalletHistory(),
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                // height: 100,
-                                // color: Colors.blue,
-                                child: _AllActions(),
-                              )
-                            ],
-                          ),
-                        )
-                      ],
+                          Expanded(
+                            flex: 2,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    // height: 100,
+                                    // color: Colors.blue,
+                                    child: _AllActions(),
+                                  ),
+                                )
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -452,7 +456,10 @@ class _WalletHistory extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        ResponsiveWidget.is_small_screen(context)
+                            ? CrossAxisAlignment.start
+                            : CrossAxisAlignment.stretch,
                     children: [
                       const Padding(
                         padding: EdgeInsets.only(top: 16, left: 8),
@@ -480,12 +487,201 @@ class _WalletHistory extends StatelessWidget {
                           size: 20,
                         ),
                       ),
-                      Padding(
+                      ResponsiveWidget.is_small_screen(context)
+                          ? Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                height: 300,
+                                width: double.maxFinite,
+                                child: SfCartesianChart(
+                                    tooltipBehavior: TooltipBehavior(
+                                        enable: true, format: 'point.y\$'),
+                                    zoomPanBehavior: ZoomPanBehavior(
+                                        enableSelectionZooming: true,
+                                        enableMouseWheelZooming: true),
+                                    primaryXAxis: DateTimeAxis(
+                                        intervalType: DateTimeIntervalType.auto,
+                                        dateFormat: DateFormat.yMd()),
+                                    series: <
+                                        SplineAreaSeries<WalletData, DateTime>>[
+                                      SplineAreaSeries<WalletData, DateTime>(
+                                          name: 'Money',
+                                          splineType: SplineType.monotonic,
+                                          color: active.withOpacity(.2),
+                                          borderWidth: 4,
+                                          markerSettings: const MarkerSettings(
+                                              isVisible: true,
+                                              // Marker shape is set to diamond
+                                              shape: DataMarkerType.diamond),
+                                          borderGradient: const LinearGradient(
+                                              colors: <Color>[
+                                                Color.fromRGBO(50, 40, 200, 1),
+                                                Color.fromRGBO(50, 100, 240, 1)
+                                              ],
+                                              stops: <double>[
+                                                0.2,
+                                                0.9
+                                              ]),
+                                          dataSource: wallet_data,
+                                          xValueMapper:
+                                              (WalletData action, _) =>
+                                                  action.date,
+                                          yValueMapper:
+                                              (WalletData action, _) =>
+                                                  action.action)
+                                    ]),
+                              ),
+                            )
+                          : Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  width: double.maxFinite,
+                                  child: SfCartesianChart(
+                                      tooltipBehavior: TooltipBehavior(
+                                          enable: true, format: 'point.y\$'),
+                                      zoomPanBehavior: ZoomPanBehavior(
+                                          enableSelectionZooming: true,
+                                          enableMouseWheelZooming: true),
+                                      primaryXAxis: DateTimeAxis(
+                                          intervalType:
+                                              DateTimeIntervalType.auto,
+                                          dateFormat: DateFormat.yMd()),
+                                      series: <
+                                          SplineAreaSeries<WalletData,
+                                              DateTime>>[
+                                        SplineAreaSeries<WalletData, DateTime>(
+                                            name: 'Money',
+                                            splineType: SplineType.monotonic,
+                                            color: active.withOpacity(.2),
+                                            borderWidth: 4,
+                                            markerSettings:
+                                                const MarkerSettings(
+                                                    isVisible: true,
+                                                    // Marker shape is set to diamond
+                                                    shape:
+                                                        DataMarkerType.diamond),
+                                            borderGradient:
+                                                const LinearGradient(colors: <
+                                                    Color>[
+                                              Color.fromRGBO(50, 40, 200, 1),
+                                              Color.fromRGBO(50, 100, 240, 1)
+                                            ], stops: <double>[
+                                              0.2,
+                                              0.9
+                                            ]),
+                                            dataSource: wallet_data,
+                                            xValueMapper:
+                                                (WalletData action, _) =>
+                                                    action.date,
+                                            yValueMapper:
+                                                (WalletData action, _) =>
+                                                    action.action)
+                                      ]),
+                                ),
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+          return const _WalletHistoryShimmer();
+        },
+        future: c.load_wallet_history(),
+      );
+    }
+
+    // print(walletData.toString());
+    //TODO don't calculate wallet_data while build
+    var wallet_data =
+        c.wallet_history.map((e) => WalletData(e['date'], e['value'])).toList();
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: Container(
+        width: double.maxFinite,
+        decoration:
+            BoxDecoration(color: dark, borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: ResponsiveWidget.is_small_screen(context)
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.stretch,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(top: 16, left: 8),
+                child: CustomText(
+                  text: 'Wallet history',
+                  color: light,
+                  size: 22,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: 1,
+                  width: double.maxFinite,
+                  color: light,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CustomText(
+                  text: c.wallet['money'] != null
+                      ? 'Total: ' + c.wallet['money'].toString() + '\$'
+                      : '',
+                  color: active,
+                  size: 20,
+                ),
+              ),
+              ResponsiveWidget.is_small_screen(context)
+                  ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        height: 300,
+                        width: double.maxFinite,
+                        child: SfCartesianChart(
+                            tooltipBehavior: TooltipBehavior(
+                                enable: true, format: 'point.y\$'),
+                            zoomPanBehavior: ZoomPanBehavior(
+                                enableSelectionZooming: true,
+                                enableMouseWheelZooming: true),
+                            primaryXAxis: DateTimeAxis(
+                                intervalType: DateTimeIntervalType.auto,
+                                dateFormat: DateFormat.yMd()),
+                            series: <SplineAreaSeries<WalletData, DateTime>>[
+                              SplineAreaSeries<WalletData, DateTime>(
+                                  name: 'Money',
+                                  splineType: SplineType.monotonic,
+                                  color: active.withOpacity(.2),
+                                  borderWidth: 4,
+                                  markerSettings: const MarkerSettings(
+                                      isVisible: true,
+                                      // Marker shape is set to diamond
+                                      shape: DataMarkerType.diamond),
+                                  borderGradient: const LinearGradient(
+                                      colors: <Color>[
+                                        Color.fromRGBO(50, 40, 200, 1),
+                                        Color.fromRGBO(50, 100, 240, 1)
+                                      ],
+                                      stops: <double>[
+                                        0.2,
+                                        0.9
+                                      ]),
+                                  dataSource: wallet_data,
+                                  xValueMapper: (WalletData action, _) =>
+                                      action.date,
+                                  yValueMapper: (WalletData action, _) =>
+                                      action.action)
+                            ]),
+                      ),
+                    )
+                  : Expanded(
+                      child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
-                          height: ResponsiveWidget.is_small_screen(context)
-                              ? 300
-                              : 583,
                           width: double.maxFinite,
                           child: SfCartesianChart(
                               tooltipBehavior: TooltipBehavior(
@@ -523,99 +719,7 @@ class _WalletHistory extends StatelessWidget {
                               ]),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }
-          return const _WalletHistoryShimmer();
-        },
-        future: c.load_wallet_history(),
-      );
-    }
-
-    // print(walletData.toString());
-    //TODO don't calculate wallet_data while build
-    var wallet_data =
-        c.wallet_history.map((e) => WalletData(e['date'], e['value'])).toList();
-    return Padding(
-      padding: const EdgeInsets.only(right: 10),
-      child: Container(
-        width: double.maxFinite,
-        decoration:
-            BoxDecoration(color: dark, borderRadius: BorderRadius.circular(20)),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 16, left: 8),
-                child: CustomText(
-                  text: 'Wallet history',
-                  color: light,
-                  size: 22,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  height: 1,
-                  width: double.maxFinite,
-                  color: light,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CustomText(
-                  text: c.wallet['money'] != null
-                      ? 'Total: ' + c.wallet['money'].toString() + '\$'
-                      : '',
-                  color: active,
-                  size: 20,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  height: ResponsiveWidget.is_small_screen(context) ? 300 : 583,
-                  width: double.maxFinite,
-                  child: SfCartesianChart(
-                      tooltipBehavior:
-                          TooltipBehavior(enable: true, format: 'point.y\$'),
-                      zoomPanBehavior: ZoomPanBehavior(
-                          enableSelectionZooming: true,
-                          enableMouseWheelZooming: true),
-                      primaryXAxis: DateTimeAxis(
-                          intervalType: DateTimeIntervalType.auto,
-                          dateFormat: DateFormat.yMd()),
-                      series: <SplineAreaSeries<WalletData, DateTime>>[
-                        SplineAreaSeries<WalletData, DateTime>(
-                            name: 'Money',
-                            splineType: SplineType.monotonic,
-                            color: active.withOpacity(.2),
-                            borderWidth: 4,
-                            markerSettings: const MarkerSettings(
-                                isVisible: true,
-                                // Marker shape is set to diamond
-                                shape: DataMarkerType.diamond),
-                            borderGradient: const LinearGradient(
-                                colors: <Color>[
-                                  Color.fromRGBO(50, 40, 200, 1),
-                                  Color.fromRGBO(50, 100, 240, 1)
-                                ],
-                                stops: <double>[
-                                  0.2,
-                                  0.9
-                                ]),
-                            dataSource: wallet_data,
-                            xValueMapper: (WalletData action, _) => action.date,
-                            yValueMapper: (WalletData action, _) =>
-                                action.action)
-                      ]),
-                ),
-              ),
+                    ),
             ],
           ),
         ),
@@ -638,7 +742,9 @@ class _WalletHistoryShimmer extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: ResponsiveWidget.is_small_screen(context)
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.stretch,
             children: [
               const Padding(
                 padding: EdgeInsets.only(top: 16, left: 8),
@@ -656,38 +762,73 @@ class _WalletHistoryShimmer extends StatelessWidget {
                   color: light,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                    height:
-                        ResponsiveWidget.is_small_screen(context) ? 340 : 623,
-                    width: double.maxFinite,
-                    child: Shimmer.fromColors(
-                        baseColor: light.withOpacity(.2),
-                        highlightColor: light_grey.withOpacity(.2),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: active,
-                                    borderRadius: BorderRadius.circular(20)),
-                                height: 20,
-                                width: 100,
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: active,
-                                    borderRadius: BorderRadius.circular(20)),
-                              ),
-                            ),
-                          ],
-                        ))),
-              ),
+              ResponsiveWidget.is_small_screen(context)
+                  ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                          height: 338,
+                          width: double.maxFinite,
+                          child: Shimmer.fromColors(
+                              baseColor: light.withOpacity(.2),
+                              highlightColor: light_grey.withOpacity(.2),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 8),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: active,
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      height: 20,
+                                      width: 100,
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 310,
+                                    decoration: BoxDecoration(
+                                        color: active,
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                  ),
+                                ],
+                              ))),
+                    )
+                  : Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                            width: double.maxFinite,
+                            child: Shimmer.fromColors(
+                                baseColor: light.withOpacity(.2),
+                                highlightColor: light_grey.withOpacity(.2),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                        height: 20,
+                                        width: 100,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                      ),
+                                    ),
+                                  ],
+                                ))),
+                      ),
+                    ),
             ],
           ),
         ),
@@ -717,12 +858,328 @@ class _AllActions extends StatelessWidget {
             final actions = snapshot.data as List;
             return Container(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: ResponsiveWidget.is_small_screen(context)
+                    ? CrossAxisAlignment.start
+                    : CrossAxisAlignment.stretch,
                 children: [
-                  Container(
-                    height:
-                        ResponsiveWidget.is_small_screen(context) ? 300 : 712,
+                  ResponsiveWidget.is_small_screen(context)
+                      ? Container(
+                          height: 400,
+                          decoration: BoxDecoration(
+                              color: dark,
+                              borderRadius: BorderRadius.circular(20)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 8, horizontal: 8),
+                                        child: CustomText(
+                                          text: 'Actions',
+                                          color: light,
+                                          size: 22,
+                                        ),
+                                      ),
+                                      Container(
+                                        height: 1,
+                                        width: double.maxFinite,
+                                        color: light,
+                                      ),
+                                      DataTable2(
+                                        headingRowColor:
+                                            MaterialStateColor.resolveWith(
+                                                (states) => dark),
+                                        dataRowColor:
+                                            MaterialStateColor.resolveWith(
+                                                (states) => dark),
+                                        headingTextStyle:
+                                            const TextStyle(color: light),
+                                        dataTextStyle:
+                                            const TextStyle(color: light),
+                                        columnSpacing: 12,
+                                        horizontalMargin: 12,
+                                        minWidth: 300,
+                                        columns: [
+                                          const DataColumn2(
+                                            label: Text('Ticker',
+                                                style:
+                                                    TextStyle(color: active)),
+                                            size: ColumnSize.L,
+                                          ),
+                                          const DataColumn2(
+                                            label: Text('Action',
+                                                style:
+                                                    TextStyle(color: active)),
+                                            size: ColumnSize.L,
+                                          ),
+                                          const DataColumn2(
+                                            label: Text('Price',
+                                                style:
+                                                    TextStyle(color: active)),
+                                            size: ColumnSize.L,
+                                          ),
+                                          const DataColumn2(
+                                            label: Text('Profit',
+                                                style:
+                                                    TextStyle(color: active)),
+                                            size: ColumnSize.S,
+                                          ),
+                                        ],
+                                        rows: actions
+                                            .map(
+                                              (data) => DataRow(cells: [
+                                                DataCell(Text(data['ticker'])),
+                                                DataCell(Text(
+                                                  data['action'],
+                                                  style: TextStyle(
+                                                      color: data['action'] ==
+                                                              'Sell'
+                                                          ? success
+                                                          : danger),
+                                                )),
+                                                DataCell(Text(
+                                                    data['price'].toString() +
+                                                        '\$')),
+                                                DataCell(Text(
+                                                  data['profit'].toString() +
+                                                      '\$',
+                                                  style: TextStyle(
+                                                      color: data['profit'] > 0
+                                                          ? success
+                                                          : data['profit'] < 0
+                                                              ? danger
+                                                              : light_grey),
+                                                )),
+                                              ]),
+                                            )
+                                            .toList(),
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                          ),
+                        )
+                      : Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: dark,
+                                borderRadius: BorderRadius.circular(20)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 8, horizontal: 8),
+                                          child: CustomText(
+                                            text: 'Actions',
+                                            color: light,
+                                            size: 22,
+                                          ),
+                                        ),
+                                        Container(
+                                          height: 1,
+                                          width: double.maxFinite,
+                                          color: light,
+                                        ),
+                                        DataTable2(
+                                          headingRowColor:
+                                              MaterialStateColor.resolveWith(
+                                                  (states) => dark),
+                                          dataRowColor:
+                                              MaterialStateColor.resolveWith(
+                                                  (states) => dark),
+                                          headingTextStyle:
+                                              const TextStyle(color: light),
+                                          dataTextStyle:
+                                              const TextStyle(color: light),
+                                          columnSpacing: 12,
+                                          horizontalMargin: 12,
+                                          minWidth: 300,
+                                          columns: [
+                                            const DataColumn2(
+                                              label: Text('Ticker',
+                                                  style:
+                                                      TextStyle(color: active)),
+                                              size: ColumnSize.L,
+                                            ),
+                                            const DataColumn2(
+                                              label: Text('Action',
+                                                  style:
+                                                      TextStyle(color: active)),
+                                              size: ColumnSize.L,
+                                            ),
+                                            const DataColumn2(
+                                              label: Text('Price',
+                                                  style:
+                                                      TextStyle(color: active)),
+                                              size: ColumnSize.L,
+                                            ),
+                                            const DataColumn2(
+                                              label: Text('Profit',
+                                                  style:
+                                                      TextStyle(color: active)),
+                                              size: ColumnSize.S,
+                                            ),
+                                          ],
+                                          rows: actions
+                                              .map(
+                                                (data) => DataRow(cells: [
+                                                  DataCell(
+                                                      Text(data['ticker'])),
+                                                  DataCell(Text(
+                                                    data['action'],
+                                                    style: TextStyle(
+                                                        color: data['action'] ==
+                                                                'Sell'
+                                                            ? success
+                                                            : danger),
+                                                  )),
+                                                  DataCell(Text(
+                                                      data['price'].toString() +
+                                                          '\$')),
+                                                  DataCell(Text(
+                                                    data['profit'].toString() +
+                                                        '\$',
+                                                    style: TextStyle(
+                                                        color: data['profit'] >
+                                                                0
+                                                            ? success
+                                                            : data['profit'] < 0
+                                                                ? danger
+                                                                : light_grey),
+                                                  )),
+                                                ]),
+                                              )
+                                              .toList(),
+                                        ),
+                                      ],
+                                    ),
+                                  )),
+                            ),
+                          ),
+                        ),
+                ],
+              ),
+            );
+          }
+          return const _ActionsShimmer();
+        },
+        future: c.load_actions(),
+      );
+    }
+    return Container(
+      child: Column(
+        crossAxisAlignment: ResponsiveWidget.is_small_screen(context)
+            ? CrossAxisAlignment.stretch
+            : CrossAxisAlignment.start,
+        children: [
+          ResponsiveWidget.is_small_screen(context)
+              ? Container(
+                  height: 400,
+                  decoration: BoxDecoration(
+                      color: dark, borderRadius: BorderRadius.circular(20)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 8, horizontal: 8),
+                                child: CustomText(
+                                  text: 'Actions',
+                                  color: light,
+                                  size: 22,
+                                ),
+                              ),
+                              Container(
+                                height: 1,
+                                width: double.maxFinite,
+                                color: light,
+                              ),
+                              DataTable2(
+                                headingRowColor: MaterialStateColor.resolveWith(
+                                    (states) => dark),
+                                dataRowColor: MaterialStateColor.resolveWith(
+                                    (states) => dark),
+                                headingTextStyle: const TextStyle(color: light),
+                                dataTextStyle: const TextStyle(color: light),
+                                columnSpacing: 12,
+                                horizontalMargin: 12,
+                                minWidth: 300,
+                                columns: [
+                                  const DataColumn2(
+                                    label: Text('Ticker',
+                                        style: TextStyle(color: active)),
+                                    size: ColumnSize.L,
+                                  ),
+                                  const DataColumn2(
+                                    label: Text('Action',
+                                        style: TextStyle(color: active)),
+                                    size: ColumnSize.L,
+                                  ),
+                                  const DataColumn2(
+                                    label: Text('Price',
+                                        style: TextStyle(color: active)),
+                                    size: ColumnSize.L,
+                                  ),
+                                  const DataColumn2(
+                                    label: Text('Profit',
+                                        style: TextStyle(color: active)),
+                                    size: ColumnSize.S,
+                                  ),
+                                ],
+                                rows: c.actions
+                                    .map(
+                                      (data) => DataRow(cells: [
+                                        DataCell(Text(data['ticker'])),
+                                        DataCell(Text(
+                                          data['action'],
+                                          style: TextStyle(
+                                              color: data['action'] == 'Sell'
+                                                  ? success
+                                                  : danger),
+                                        )),
+                                        DataCell(Text(
+                                            data['price'].toString() + '\$')),
+                                        DataCell(Text(
+                                          data['profit'].toString() + '\$',
+                                          style: TextStyle(
+                                              color: data['profit'] > 0
+                                                  ? success
+                                                  : data['profit'] < 0
+                                                      ? danger
+                                                      : light_grey),
+                                        )),
+                                      ]),
+                                    )
+                                    .toList(),
+                              ),
+                            ],
+                          ),
+                        )),
+                  ),
+                )
+              : Expanded(
+                  child: Container(
                     decoration: BoxDecoration(
                         color: dark, borderRadius: BorderRadius.circular(20)),
                     child: Padding(
@@ -782,7 +1239,7 @@ class _AllActions extends StatelessWidget {
                                       size: ColumnSize.S,
                                     ),
                                   ],
-                                  rows: actions
+                                  rows: c.actions
                                       .map(
                                         (data) => DataRow(cells: [
                                           DataCell(Text(data['ticker'])),
@@ -813,110 +1270,7 @@ class _AllActions extends StatelessWidget {
                           )),
                     ),
                   ),
-                ],
-              ),
-            );
-          }
-          return const _ActionsShimmer();
-        },
-        future: c.load_actions(),
-      );
-    }
-    return Container(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Container(
-            height: ResponsiveWidget.is_small_screen(context) ? 340 : 712,
-            decoration: BoxDecoration(
-                color: dark, borderRadius: BorderRadius.circular(20)),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                          child: CustomText(
-                            text: 'Actions',
-                            color: light,
-                            size: 22,
-                          ),
-                        ),
-                        Container(
-                          height: 1,
-                          width: double.maxFinite,
-                          color: light,
-                        ),
-                        DataTable2(
-                          headingRowColor:
-                              MaterialStateColor.resolveWith((states) => dark),
-                          dataRowColor:
-                              MaterialStateColor.resolveWith((states) => dark),
-                          headingTextStyle: const TextStyle(color: light),
-                          dataTextStyle: const TextStyle(color: light),
-                          columnSpacing: 12,
-                          horizontalMargin: 12,
-                          minWidth: 300,
-                          columns: [
-                            const DataColumn2(
-                              label: Text('Ticker',
-                                  style: TextStyle(color: active)),
-                              size: ColumnSize.L,
-                            ),
-                            const DataColumn2(
-                              label: Text('Action',
-                                  style: TextStyle(color: active)),
-                              size: ColumnSize.L,
-                            ),
-                            const DataColumn2(
-                              label: Text('Price',
-                                  style: TextStyle(color: active)),
-                              size: ColumnSize.L,
-                            ),
-                            const DataColumn2(
-                              label: Text('Profit',
-                                  style: TextStyle(color: active)),
-                              size: ColumnSize.S,
-                            ),
-                          ],
-                          rows: c.actions
-                              .map(
-                                (data) => DataRow(cells: [
-                                  DataCell(Text(data['ticker'])),
-                                  DataCell(Text(
-                                    data['action'],
-                                    style: TextStyle(
-                                        color: data['action'] == 'Sell'
-                                            ? success
-                                            : danger),
-                                  )),
-                                  DataCell(
-                                      Text(data['price'].toString() + '\$')),
-                                  DataCell(Text(
-                                    data['profit'].toString() + '\$',
-                                    style: TextStyle(
-                                        color: data['profit'] > 0
-                                            ? success
-                                            : data['profit'] < 0
-                                                ? danger
-                                                : light_grey),
-                                  )),
-                                ]),
-                              )
-                              .toList(),
-                        ),
-                      ],
-                    ),
-                  )),
-            ),
-          ),
+                ),
         ],
       ),
     );
@@ -930,154 +1284,301 @@ class _ActionsShimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: ResponsiveWidget.is_small_screen(context)
+            ? CrossAxisAlignment.start
+            : CrossAxisAlignment.stretch,
         children: [
-          Container(
-            decoration: BoxDecoration(
-                color: dark, borderRadius: BorderRadius.circular(20)),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
+          ResponsiveWidget.is_small_screen(context)
+              ? Container(
+                  decoration: BoxDecoration(
+                      color: dark, borderRadius: BorderRadius.circular(20)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                          child: CustomText(
-                            text: 'Actions',
-                            color: light,
-                            size: 22,
-                          ),
-                        ),
-                        Container(
-                          height: 1,
-                          width: double.maxFinite,
-                          color: light,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: light.withOpacity(.2),
-                              borderRadius: BorderRadius.circular(20),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 8),
+                            child: CustomText(
+                              text: 'Actions',
+                              color: light,
+                              size: 22,
                             ),
-                            height: 629,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8),
-                              child: Shimmer.fromColors(
-                                baseColor: light.withOpacity(.2),
-                                highlightColor: light_grey.withOpacity(.2),
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                  ],
+                          ),
+                          Container(
+                            height: 1,
+                            width: double.maxFinite,
+                            color: light,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Container(
+                              height: 300,
+                              decoration: BoxDecoration(
+                                color: light.withOpacity(.2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: Shimmer.fromColors(
+                                  baseColor: light.withOpacity(.2),
+                                  highlightColor: light_grey.withOpacity(.2),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        )
-                      ],
+                          )
+                        ],
+                      ),
                     ),
-                  )),
-            ),
-          ),
+                  ),
+                )
+              : Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: dark, borderRadius: BorderRadius.circular(20)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 8),
+                              child: CustomText(
+                                text: 'Actions',
+                                color: light,
+                                size: 22,
+                              ),
+                            ),
+                            Container(
+                              height: 1,
+                              width: double.maxFinite,
+                              color: light,
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: light.withOpacity(.2),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: Shimmer.fromColors(
+                                      baseColor: light.withOpacity(.2),
+                                      highlightColor:
+                                          light_grey.withOpacity(.2),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
         ],
       ),
     );

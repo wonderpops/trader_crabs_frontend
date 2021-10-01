@@ -39,65 +39,87 @@ class _TickerInfoState extends State<TickerInfo> {
     return SmartRefresher(
       controller: _refreshController,
       onRefresh: _onRefresh,
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              child: _TickerInfo(
-                ticker: widget.ticker,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: ResponsiveWidget.is_small_screen(context)
-                  ? Column(
+      child: ResponsiveWidget.is_small_screen(context)
+          ? SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: _TickerInfo(
+                      ticker: widget.ticker,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Column(
                       children: [
                         _TickerHistory(ticker: widget.ticker),
                         _TickerActions(ticker: widget.ticker)
                       ],
-                    )
-                  : Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 4,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                // height: 100,
-                                // color: Colors.red,
-                                child: Container(
-                                  child: _TickerHistory(ticker: widget.ticker),
-                                  // width: 700,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                // height: 100,
-                                // color: Colors.blue,
-                                child: _TickerActions(ticker: widget.ticker),
-                              )
-                            ],
-                          ),
-                        )
-                      ],
                     ),
+                  ),
+                ],
+              ),
+            )
+          : SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: _TickerInfo(
+                      ticker: widget.ticker,
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            flex: 4,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    // height: 100,
+                                    // color: Colors.red,
+                                    child:
+                                        _TickerHistory(ticker: widget.ticker),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    // height: 100,
+                                    // color: Colors.blue,
+                                    child:
+                                        _TickerActions(ticker: widget.ticker),
+                                  ),
+                                )
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -247,7 +269,10 @@ class _TickerHistoryState extends State<_TickerHistory> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        ResponsiveWidget.is_small_screen(context)
+                            ? CrossAxisAlignment.start
+                            : CrossAxisAlignment.stretch,
                     children: [
                       const Padding(
                         padding: EdgeInsets.only(top: 16, left: 8),
@@ -302,22 +327,13 @@ class _TickerHistoryState extends State<_TickerHistory> {
                                                 onSubmit: (Object value) async {
                                                   if (value
                                                       is PickerDateRange) {
-                                                    var start_date = value
-                                                        .startDate!
-                                                        .add(const Duration(
-                                                            days: 1));
-                                                    ;
+                                                    var start_date =
+                                                        value.startDate!;
                                                     var end_date =
-                                                        value.endDate;
-                                                    if (end_date == null) {
-                                                      end_date = start_date.add(
-                                                          const Duration(
-                                                              days: 1));
-                                                    } else {
-                                                      end_date = end_date.add(
-                                                          const Duration(
-                                                              days: 1));
-                                                    }
+                                                        value.endDate ??
+                                                            start_date.add(
+                                                                const Duration(
+                                                                    days: 1));
                                                     await c.load_ticker_history(
                                                         widget.ticker,
                                                         start_date.toUtc(),
@@ -385,12 +401,573 @@ class _TickerHistoryState extends State<_TickerHistory> {
                           ],
                         ),
                       ),
-                      Padding(
+                      ResponsiveWidget.is_small_screen(context)
+                          ? Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                height: 600,
+                                width: double.maxFinite,
+                                child: Column(
+                                  children: [
+                                    SfCartesianChart(
+                                        tooltipBehavior: TooltipBehavior(
+                                            enable: true, format: 'point.y\$'),
+                                        zoomPanBehavior: ZoomPanBehavior(
+                                            enableSelectionZooming: true,
+                                            enableMouseWheelZooming: true),
+                                        primaryXAxis: DateTimeAxis(
+                                            intervalType:
+                                                DateTimeIntervalType.auto,
+                                            dateFormat:
+                                                DateFormat('yy-MM-dd hh:mm')),
+                                        series: <
+                                            SplineAreaSeries<dynamic,
+                                                DateTime>>[
+                                          SplineAreaSeries<TickerData,
+                                                  DateTime>(
+                                              name: 'Price',
+                                              splineType: SplineType.monotonic,
+                                              color: active.withOpacity(.2),
+                                              borderWidth: 4,
+                                              borderGradient:
+                                                  const LinearGradient(colors: <
+                                                      Color>[
+                                                Color.fromRGBO(50, 40, 200, 1),
+                                                Color.fromRGBO(50, 100, 240, 1)
+                                              ], stops: <double>[
+                                                0.2,
+                                                0.9
+                                              ]),
+                                              dataSource: ticker_data,
+                                              xValueMapper:
+                                                  (TickerData action, _) =>
+                                                      action.date,
+                                              yValueMapper:
+                                                  (TickerData action, _) =>
+                                                      action.a),
+                                          SplineAreaSeries<TickerActionData,
+                                                  DateTime>(
+                                              name: 'Sell',
+                                              color: success.withOpacity(.0),
+                                              markerSettings:
+                                                  const MarkerSettings(
+                                                      isVisible: true,
+                                                      // Marker shape is set to diamond
+                                                      shape: DataMarkerType
+                                                          .diamond),
+                                              dataSource:
+                                                  ticker_action_sell_data,
+                                              xValueMapper:
+                                                  (TickerActionData action,
+                                                          _) =>
+                                                      action.date,
+                                              yValueMapper:
+                                                  (TickerActionData action,
+                                                          _) =>
+                                                      action.action),
+                                          SplineAreaSeries<TickerActionData,
+                                                  DateTime>(
+                                              name: 'Buy',
+                                              color: danger.withOpacity(.0),
+                                              markerSettings:
+                                                  const MarkerSettings(
+                                                      isVisible: true,
+                                                      // Marker shape is set to diamond
+                                                      shape: DataMarkerType
+                                                          .diamond),
+                                              dataSource:
+                                                  ticker_action_buy_data,
+                                              xValueMapper:
+                                                  (TickerActionData action,
+                                                          _) =>
+                                                      action.date,
+                                              yValueMapper:
+                                                  (TickerActionData action,
+                                                          _) =>
+                                                      action.action)
+                                        ]),
+                                    SfCartesianChart(
+                                        tooltipBehavior: TooltipBehavior(
+                                            enable: true, format: 'point.y%'),
+                                        zoomPanBehavior: ZoomPanBehavior(
+                                            enableSelectionZooming: true,
+                                            enableMouseWheelZooming: true),
+                                        primaryXAxis: DateTimeAxis(
+                                            intervalType:
+                                                DateTimeIntervalType.auto,
+                                            dateFormat:
+                                                DateFormat('yy-MM-dd hh:mm')),
+                                        series: <
+                                            LineSeries<TickerData, DateTime>>[
+                                          LineSeries<TickerData, DateTime>(
+                                              name: '%K',
+                                              color:
+                                                  Colors.orange.withOpacity(.4),
+                                              dataSource: ticker_data,
+                                              xValueMapper:
+                                                  (TickerData action, _) =>
+                                                      action.date,
+                                              yValueMapper:
+                                                  (TickerData action, _) =>
+                                                      action.k),
+                                          LineSeries<TickerData, DateTime>(
+                                              name: '%D',
+                                              color:
+                                                  Colors.blue.withOpacity(.4),
+                                              dataSource: ticker_data,
+                                              xValueMapper:
+                                                  (TickerData action, _) =>
+                                                      action.date,
+                                              yValueMapper:
+                                                  (TickerData action, _) =>
+                                                      action.d),
+                                          LineSeries<TickerData, DateTime>(
+                                              name: '90%',
+                                              color: success.withOpacity(.4),
+                                              dataSource: ticker_data,
+                                              xValueMapper:
+                                                  (TickerData action, _) =>
+                                                      action.date,
+                                              yValueMapper:
+                                                  (TickerData action, _) => 90),
+                                          LineSeries<TickerData, DateTime>(
+                                              name: '10%',
+                                              color: success.withOpacity(.4),
+                                              dataSource: ticker_data,
+                                              xValueMapper:
+                                                  (TickerData action, _) =>
+                                                      action.date,
+                                              yValueMapper:
+                                                  (TickerData action, _) => 10),
+                                        ])
+                                  ],
+                                ),
+                              ),
+                            )
+                          : Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  // height: ResponsiveWidget.is_small_screen(context)
+                                  //     ? 600
+                                  //     : 660,
+                                  width: double.maxFinite,
+                                  child: Column(
+                                    children: [
+                                      SfCartesianChart(
+                                          tooltipBehavior: TooltipBehavior(
+                                              enable: true,
+                                              format: 'point.y\$'),
+                                          zoomPanBehavior: ZoomPanBehavior(
+                                              enableSelectionZooming: true,
+                                              enableMouseWheelZooming: true),
+                                          primaryXAxis: DateTimeAxis(
+                                              intervalType:
+                                                  DateTimeIntervalType.auto,
+                                              dateFormat:
+                                                  DateFormat('yy-MM-dd hh:mm')),
+                                          series: <
+                                              SplineAreaSeries<dynamic,
+                                                  DateTime>>[
+                                            SplineAreaSeries<TickerData,
+                                                    DateTime>(
+                                                name: 'Price',
+                                                splineType:
+                                                    SplineType.monotonic,
+                                                color: active.withOpacity(.2),
+                                                borderWidth: 4,
+                                                borderGradient:
+                                                    const LinearGradient(
+                                                        colors: <Color>[
+                                                      Color.fromRGBO(
+                                                          50, 40, 200, 1),
+                                                      Color.fromRGBO(
+                                                          50, 100, 240, 1)
+                                                    ],
+                                                        stops: <double>[
+                                                      0.2,
+                                                      0.9
+                                                    ]),
+                                                dataSource: ticker_data,
+                                                xValueMapper:
+                                                    (TickerData action, _) =>
+                                                        action.date,
+                                                yValueMapper:
+                                                    (TickerData action, _) =>
+                                                        action.a),
+                                            SplineAreaSeries<TickerActionData,
+                                                    DateTime>(
+                                                name: 'Sell',
+                                                color: success.withOpacity(.0),
+                                                markerSettings:
+                                                    const MarkerSettings(
+                                                        isVisible: true,
+                                                        // Marker shape is set to diamond
+                                                        shape: DataMarkerType
+                                                            .diamond),
+                                                dataSource:
+                                                    ticker_action_sell_data,
+                                                xValueMapper:
+                                                    (TickerActionData action,
+                                                            _) =>
+                                                        action.date,
+                                                yValueMapper:
+                                                    (TickerActionData action,
+                                                            _) =>
+                                                        action.action),
+                                            SplineAreaSeries<TickerActionData,
+                                                    DateTime>(
+                                                name: 'Buy',
+                                                color: danger.withOpacity(.0),
+                                                markerSettings:
+                                                    const MarkerSettings(
+                                                        isVisible: true,
+                                                        // Marker shape is set to diamond
+                                                        shape: DataMarkerType
+                                                            .diamond),
+                                                dataSource:
+                                                    ticker_action_buy_data,
+                                                xValueMapper:
+                                                    (TickerActionData action,
+                                                            _) =>
+                                                        action.date,
+                                                yValueMapper:
+                                                    (TickerActionData action,
+                                                            _) =>
+                                                        action.action)
+                                          ]),
+                                      SfCartesianChart(
+                                          tooltipBehavior: TooltipBehavior(
+                                              enable: true, format: 'point.y%'),
+                                          zoomPanBehavior: ZoomPanBehavior(
+                                              enableSelectionZooming: true,
+                                              enableMouseWheelZooming: true),
+                                          primaryXAxis: DateTimeAxis(
+                                              intervalType:
+                                                  DateTimeIntervalType.auto,
+                                              dateFormat:
+                                                  DateFormat('yy-MM-dd hh:mm')),
+                                          series: <
+                                              LineSeries<TickerData, DateTime>>[
+                                            LineSeries<TickerData, DateTime>(
+                                                name: '%K',
+                                                color: Colors.orange
+                                                    .withOpacity(.4),
+                                                dataSource: ticker_data,
+                                                xValueMapper:
+                                                    (TickerData action, _) =>
+                                                        action.date,
+                                                yValueMapper:
+                                                    (TickerData action, _) =>
+                                                        action.k),
+                                            LineSeries<TickerData, DateTime>(
+                                                name: '%D',
+                                                color:
+                                                    Colors.blue.withOpacity(.4),
+                                                dataSource: ticker_data,
+                                                xValueMapper:
+                                                    (TickerData action, _) =>
+                                                        action.date,
+                                                yValueMapper:
+                                                    (TickerData action, _) =>
+                                                        action.d),
+                                            LineSeries<TickerData, DateTime>(
+                                                name: '90%',
+                                                color: success.withOpacity(.4),
+                                                dataSource: ticker_data,
+                                                xValueMapper:
+                                                    (TickerData action, _) =>
+                                                        action.date,
+                                                yValueMapper:
+                                                    (TickerData action, _) =>
+                                                        90),
+                                            LineSeries<TickerData, DateTime>(
+                                                name: '10%',
+                                                color: success.withOpacity(.4),
+                                                dataSource: ticker_data,
+                                                xValueMapper:
+                                                    (TickerData action, _) =>
+                                                        action.date,
+                                                yValueMapper:
+                                                    (TickerData action, _) =>
+                                                        10),
+                                          ])
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+          return const _TickerHistoryShimmer();
+        },
+        future: c.load_ticker_history(
+            widget.ticker,
+            DateTime(DateTime.now().year, DateTime.now().month,
+                    DateTime.now().day)
+                .toUtc(),
+            DateTime(DateTime.now().year, DateTime.now().month,
+                    DateTime.now().day + 1)
+                .toUtc()),
+      );
+    }
+
+    // print(walletData.toString());
+    //TODO don't calculate wallet_data while build
+    var ticker_data = c.ticker_history
+        .map((e) => TickerData(e['date'], e['a'], e['k'], e['d']))
+        .toList();
+    var ticker_action_sell_data = c.ticker_actions_sell_history
+        .map((e) => TickerActionData(e['date'], e['value']))
+        .toList();
+    var ticker_action_buy_data = c.ticker_actions_buy_history
+        .map((e) => TickerActionData(e['date'], e['value']))
+        .toList();
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: Container(
+        width: double.maxFinite,
+        decoration:
+            BoxDecoration(color: dark, borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: ResponsiveWidget.is_small_screen(context)
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.stretch,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(top: 16, left: 8),
+                child: CustomText(
+                  text: 'Ticker history',
+                  color: light,
+                  size: 22,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: 1,
+                  width: double.maxFinite,
+                  color: light,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CustomText(
+                      text: 'Profit: ' +
+                          c.ticker_info['profit'].toString() +
+                          '\$',
+                      color: active,
+                      size: 20,
+                    ),
+                    Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(4),
+                      child: IconButton(
+                          onPressed: () {
+                            // showDatePicker(
+                            //     context: context,
+                            //     initialDate: DateTime.now(),
+                            //     firstDate: DateTime.now()
+                            //         .subtract(const Duration(days: 4)),
+                            //     lastDate: DateTime.now()
+                            //         .add(const Duration(days: 3)));
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return Center(
+                                    child: Container(
+                                      height: 400,
+                                      width: 400,
+                                      color: dark_light,
+                                      child: SfDateRangePicker(
+                                        onSelectionChanged: (date) {},
+                                        onSubmit: (Object value) async {
+                                          if (value is PickerDateRange) {
+                                            var start_date = value.startDate!;
+                                            var end_date = value.endDate ??
+                                                start_date.add(
+                                                    const Duration(days: 1));
+                                            await c.load_ticker_history(
+                                                widget.ticker,
+                                                start_date.toUtc(),
+                                                end_date.toUtc());
+                                            Navigator.of(context).pop();
+                                            setState(() {});
+                                          } else {
+                                            Navigator.of(context).pop();
+                                            setState(() {});
+                                          }
+                                        },
+                                        onCancel: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        showActionButtons: true,
+                                        headerStyle:
+                                            const DateRangePickerHeaderStyle(
+                                                textStyle:
+                                                    TextStyle(color: light)),
+                                        selectionTextStyle:
+                                            const TextStyle(color: light),
+                                        rangeTextStyle:
+                                            const TextStyle(color: light),
+                                        yearCellStyle:
+                                            const DateRangePickerYearCellStyle(
+                                                textStyle:
+                                                    TextStyle(color: light)),
+                                        monthCellStyle:
+                                            const DateRangePickerMonthCellStyle(
+                                                blackoutDateTextStyle:
+                                                    TextStyle(color: light),
+                                                weekendTextStyle:
+                                                    TextStyle(color: light),
+                                                textStyle:
+                                                    TextStyle(color: light)),
+                                        selectionMode:
+                                            DateRangePickerSelectionMode.range,
+                                        initialSelectedRange: PickerDateRange(
+                                            DateTime.now(), DateTime.now()),
+                                      ),
+                                    ),
+                                  );
+                                });
+                          },
+                          splashRadius: 20,
+                          splashColor: light.withOpacity(.2),
+                          hoverColor: light.withOpacity(.2),
+                          icon: const Icon(
+                            Icons.date_range_rounded,
+                            color: active,
+                          )),
+                    ),
+                  ],
+                ),
+              ),
+              ResponsiveWidget.is_small_screen(context)
+                  ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        height: 600,
+                        width: double.maxFinite,
+                        child: Column(
+                          children: [
+                            SfCartesianChart(
+                                tooltipBehavior: TooltipBehavior(
+                                    enable: true, format: 'point.y\$'),
+                                zoomPanBehavior: ZoomPanBehavior(
+                                    enableSelectionZooming: true,
+                                    enableMouseWheelZooming: true),
+                                primaryXAxis: DateTimeAxis(
+                                    intervalType: DateTimeIntervalType.auto,
+                                    dateFormat: DateFormat('yy-MM-dd hh:mm')),
+                                series: <SplineAreaSeries<dynamic, DateTime>>[
+                                  SplineAreaSeries<TickerData, DateTime>(
+                                      name: 'Price',
+                                      splineType: SplineType.monotonic,
+                                      color: active.withOpacity(.2),
+                                      borderWidth: 4,
+                                      borderGradient: const LinearGradient(
+                                          colors: <Color>[
+                                            Color.fromRGBO(50, 40, 200, 1),
+                                            Color.fromRGBO(50, 100, 240, 1)
+                                          ],
+                                          stops: <double>[
+                                            0.2,
+                                            0.9
+                                          ]),
+                                      dataSource: ticker_data,
+                                      xValueMapper: (TickerData action, _) =>
+                                          action.date,
+                                      yValueMapper: (TickerData action, _) =>
+                                          action.a),
+                                  SplineAreaSeries<TickerActionData, DateTime>(
+                                      name: 'Sell',
+                                      color: success.withOpacity(.0),
+                                      markerSettings: const MarkerSettings(
+                                          isVisible: true,
+                                          // Marker shape is set to diamond
+                                          shape: DataMarkerType.diamond),
+                                      dataSource: ticker_action_sell_data,
+                                      xValueMapper:
+                                          (TickerActionData action, _) =>
+                                              action.date,
+                                      yValueMapper:
+                                          (TickerActionData action, _) =>
+                                              action.action),
+                                  SplineAreaSeries<TickerActionData, DateTime>(
+                                      name: 'Buy',
+                                      color: danger.withOpacity(.0),
+                                      markerSettings: const MarkerSettings(
+                                          isVisible: true,
+                                          // Marker shape is set to diamond
+                                          shape: DataMarkerType.diamond),
+                                      dataSource: ticker_action_buy_data,
+                                      xValueMapper:
+                                          (TickerActionData action, _) =>
+                                              action.date,
+                                      yValueMapper:
+                                          (TickerActionData action, _) =>
+                                              action.action)
+                                ]),
+                            SfCartesianChart(
+                                tooltipBehavior: TooltipBehavior(
+                                    enable: true, format: 'point.y%'),
+                                zoomPanBehavior: ZoomPanBehavior(
+                                    enableSelectionZooming: true,
+                                    enableMouseWheelZooming: true),
+                                primaryXAxis: DateTimeAxis(
+                                    intervalType: DateTimeIntervalType.auto,
+                                    dateFormat: DateFormat('yy-MM-dd hh:mm')),
+                                series: <LineSeries<TickerData, DateTime>>[
+                                  LineSeries<TickerData, DateTime>(
+                                      name: '%K',
+                                      color: Colors.orange.withOpacity(.4),
+                                      dataSource: ticker_data,
+                                      xValueMapper: (TickerData action, _) =>
+                                          action.date,
+                                      yValueMapper: (TickerData action, _) =>
+                                          action.k),
+                                  LineSeries<TickerData, DateTime>(
+                                      name: '%D',
+                                      color: Colors.blue.withOpacity(.4),
+                                      dataSource: ticker_data,
+                                      xValueMapper: (TickerData action, _) =>
+                                          action.date,
+                                      yValueMapper: (TickerData action, _) =>
+                                          action.d),
+                                  LineSeries<TickerData, DateTime>(
+                                      name: '90%',
+                                      color: success.withOpacity(.4),
+                                      dataSource: ticker_data,
+                                      xValueMapper: (TickerData action, _) =>
+                                          action.date,
+                                      yValueMapper: (TickerData action, _) =>
+                                          90),
+                                  LineSeries<TickerData, DateTime>(
+                                      name: '10%',
+                                      color: success.withOpacity(.4),
+                                      dataSource: ticker_data,
+                                      xValueMapper: (TickerData action, _) =>
+                                          action.date,
+                                      yValueMapper: (TickerData action, _) =>
+                                          10),
+                                ])
+                          ],
+                        ),
+                      ),
+                    )
+                  : Expanded(
+                      child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
-                          height: ResponsiveWidget.is_small_screen(context)
-                              ? 600
-                              : 660,
                           width: double.maxFinite,
                           child: Column(
                             children: [
@@ -467,10 +1044,6 @@ class _TickerHistoryState extends State<_TickerHistory> {
                                     LineSeries<TickerData, DateTime>(
                                         name: '%K',
                                         color: Colors.orange.withOpacity(.4),
-                                        markerSettings: const MarkerSettings(
-                                            isVisible: true,
-                                            // Marker shape is set to diamond
-                                            shape: DataMarkerType.diamond),
                                         dataSource: ticker_data,
                                         xValueMapper: (TickerData action, _) =>
                                             action.date,
@@ -479,10 +1052,6 @@ class _TickerHistoryState extends State<_TickerHistory> {
                                     LineSeries<TickerData, DateTime>(
                                         name: '%D',
                                         color: Colors.blue.withOpacity(.4),
-                                        markerSettings: const MarkerSettings(
-                                            isVisible: true,
-                                            // Marker shape is set to diamond
-                                            shape: DataMarkerType.diamond),
                                         dataSource: ticker_data,
                                         xValueMapper: (TickerData action, _) =>
                                             action.date,
@@ -509,275 +1078,7 @@ class _TickerHistoryState extends State<_TickerHistory> {
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }
-          return const _TickerHistoryShimmer();
-        },
-        future: c.load_ticker_history(
-            widget.ticker,
-            DateTime.now().subtract(const Duration(days: 1)).toUtc(),
-            DateTime.now().toUtc()),
-      );
-    }
-
-    // print(walletData.toString());
-    //TODO don't calculate wallet_data while build
-    var ticker_data = c.ticker_history
-        .map((e) => TickerData(e['date'], e['a'], e['k'], e['d']))
-        .toList();
-    var ticker_action_sell_data = c.ticker_actions_sell_history
-        .map((e) => TickerActionData(e['date'], e['value']))
-        .toList();
-    var ticker_action_buy_data = c.ticker_actions_buy_history
-        .map((e) => TickerActionData(e['date'], e['value']))
-        .toList();
-    return Padding(
-      padding: const EdgeInsets.only(right: 10),
-      child: Container(
-        width: double.maxFinite,
-        decoration:
-            BoxDecoration(color: dark, borderRadius: BorderRadius.circular(20)),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 16, left: 8),
-                child: CustomText(
-                  text: 'Ticker history',
-                  color: light,
-                  size: 22,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  height: 1,
-                  width: double.maxFinite,
-                  color: light,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomText(
-                      text: 'Profit: ' +
-                          c.ticker_info['profit'].toString() +
-                          '\$',
-                      color: active,
-                      size: 20,
                     ),
-                    Material(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(4),
-                      child: IconButton(
-                          onPressed: () {
-                            // showDatePicker(
-                            //     context: context,
-                            //     initialDate: DateTime.now(),
-                            //     firstDate: DateTime.now()
-                            //         .subtract(const Duration(days: 4)),
-                            //     lastDate: DateTime.now()
-                            //         .add(const Duration(days: 3)));
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return Center(
-                                    child: Container(
-                                      height: 400,
-                                      width: 400,
-                                      color: dark_light,
-                                      child: SfDateRangePicker(
-                                        onSelectionChanged: (date) {},
-                                        onSubmit: (Object value) async {
-                                          if (value is PickerDateRange) {
-                                            var start_date = value.startDate!
-                                                .add(const Duration(days: 1));
-                                            ;
-                                            var end_date = value.endDate;
-                                            if (end_date == null) {
-                                              end_date = start_date
-                                                  .add(const Duration(days: 1));
-                                            } else {
-                                              end_date = end_date
-                                                  .add(const Duration(days: 1));
-                                            }
-                                            await c.load_ticker_history(
-                                                widget.ticker,
-                                                start_date.toUtc(),
-                                                end_date.toUtc());
-                                            Navigator.of(context).pop();
-                                            setState(() {});
-                                          } else {
-                                            Navigator.of(context).pop();
-                                            setState(() {});
-                                          }
-                                        },
-                                        onCancel: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        showActionButtons: true,
-                                        headerStyle:
-                                            const DateRangePickerHeaderStyle(
-                                                textStyle:
-                                                    TextStyle(color: light)),
-                                        selectionTextStyle:
-                                            const TextStyle(color: light),
-                                        rangeTextStyle:
-                                            const TextStyle(color: light),
-                                        yearCellStyle:
-                                            const DateRangePickerYearCellStyle(
-                                                textStyle:
-                                                    TextStyle(color: light)),
-                                        monthCellStyle:
-                                            const DateRangePickerMonthCellStyle(
-                                                blackoutDateTextStyle:
-                                                    TextStyle(color: light),
-                                                weekendTextStyle:
-                                                    TextStyle(color: light),
-                                                textStyle:
-                                                    TextStyle(color: light)),
-                                        selectionMode:
-                                            DateRangePickerSelectionMode.range,
-                                        initialSelectedRange: PickerDateRange(
-                                            DateTime.now(), DateTime.now()),
-                                      ),
-                                    ),
-                                  );
-                                });
-                          },
-                          splashRadius: 20,
-                          splashColor: light.withOpacity(.2),
-                          hoverColor: light.withOpacity(.2),
-                          icon: const Icon(
-                            Icons.date_range_rounded,
-                            color: active,
-                          )),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  height: ResponsiveWidget.is_small_screen(context) ? 600 : 660,
-                  width: double.maxFinite,
-                  child: Column(
-                    children: [
-                      SfCartesianChart(
-                          tooltipBehavior: TooltipBehavior(
-                              enable: true, format: 'point.y\$'),
-                          zoomPanBehavior: ZoomPanBehavior(
-                              enableSelectionZooming: true,
-                              enableMouseWheelZooming: true),
-                          primaryXAxis: DateTimeAxis(
-                              intervalType: DateTimeIntervalType.auto,
-                              dateFormat: DateFormat('yy-MM-dd hh:mm')),
-                          series: <SplineAreaSeries<dynamic, DateTime>>[
-                            SplineAreaSeries<TickerData, DateTime>(
-                                name: 'Price',
-                                splineType: SplineType.monotonic,
-                                color: active.withOpacity(.2),
-                                borderWidth: 4,
-                                borderGradient: const LinearGradient(
-                                    colors: <Color>[
-                                      Color.fromRGBO(50, 40, 200, 1),
-                                      Color.fromRGBO(50, 100, 240, 1)
-                                    ],
-                                    stops: <double>[
-                                      0.2,
-                                      0.9
-                                    ]),
-                                dataSource: ticker_data,
-                                xValueMapper: (TickerData action, _) =>
-                                    action.date,
-                                yValueMapper: (TickerData action, _) =>
-                                    action.a),
-                            SplineAreaSeries<TickerActionData, DateTime>(
-                                name: 'Sell',
-                                color: success.withOpacity(.0),
-                                markerSettings: const MarkerSettings(
-                                    isVisible: true,
-                                    // Marker shape is set to diamond
-                                    shape: DataMarkerType.diamond),
-                                dataSource: ticker_action_sell_data,
-                                xValueMapper: (TickerActionData action, _) =>
-                                    action.date,
-                                yValueMapper: (TickerActionData action, _) =>
-                                    action.action),
-                            SplineAreaSeries<TickerActionData, DateTime>(
-                                name: 'Buy',
-                                color: danger.withOpacity(.0),
-                                markerSettings: const MarkerSettings(
-                                    isVisible: true,
-                                    // Marker shape is set to diamond
-                                    shape: DataMarkerType.diamond),
-                                dataSource: ticker_action_buy_data,
-                                xValueMapper: (TickerActionData action, _) =>
-                                    action.date,
-                                yValueMapper: (TickerActionData action, _) =>
-                                    action.action)
-                          ]),
-                      SfCartesianChart(
-                          tooltipBehavior:
-                              TooltipBehavior(enable: true, format: 'point.y%'),
-                          zoomPanBehavior: ZoomPanBehavior(
-                              enableSelectionZooming: true,
-                              enableMouseWheelZooming: true),
-                          primaryXAxis: DateTimeAxis(
-                              intervalType: DateTimeIntervalType.auto,
-                              dateFormat: DateFormat('yy-MM-dd hh:mm')),
-                          series: <LineSeries<TickerData, DateTime>>[
-                            LineSeries<TickerData, DateTime>(
-                                name: '%K',
-                                color: Colors.orange.withOpacity(.4),
-                                markerSettings: const MarkerSettings(
-                                    isVisible: true,
-                                    // Marker shape is set to diamond
-                                    shape: DataMarkerType.diamond),
-                                dataSource: ticker_data,
-                                xValueMapper: (TickerData action, _) =>
-                                    action.date,
-                                yValueMapper: (TickerData action, _) =>
-                                    action.k),
-                            LineSeries<TickerData, DateTime>(
-                                name: '%D',
-                                color: Colors.blue.withOpacity(.4),
-                                markerSettings: const MarkerSettings(
-                                    isVisible: true,
-                                    // Marker shape is set to diamond
-                                    shape: DataMarkerType.diamond),
-                                dataSource: ticker_data,
-                                xValueMapper: (TickerData action, _) =>
-                                    action.date,
-                                yValueMapper: (TickerData action, _) =>
-                                    action.d),
-                            LineSeries<TickerData, DateTime>(
-                                name: '90%',
-                                color: success.withOpacity(.4),
-                                dataSource: ticker_data,
-                                xValueMapper: (TickerData action, _) =>
-                                    action.date,
-                                yValueMapper: (TickerData action, _) => 90),
-                            LineSeries<TickerData, DateTime>(
-                                name: '10%',
-                                color: success.withOpacity(.4),
-                                dataSource: ticker_data,
-                                xValueMapper: (TickerData action, _) =>
-                                    action.date,
-                                yValueMapper: (TickerData action, _) => 10),
-                          ])
-                    ],
-                  ),
-                ),
-              ),
             ],
           ),
         ),
@@ -800,12 +1101,14 @@ class _TickerHistoryShimmer extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: ResponsiveWidget.is_small_screen(context)
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.stretch,
             children: [
               const Padding(
                 padding: EdgeInsets.only(top: 16, left: 8),
                 child: CustomText(
-                  text: 'Wallet history',
+                  text: 'Ticker history',
                   color: light,
                   size: 22,
                 ),
@@ -818,38 +1121,75 @@ class _TickerHistoryShimmer extends StatelessWidget {
                   color: light,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                    height:
-                        ResponsiveWidget.is_small_screen(context) ? 640 : 740,
-                    width: double.maxFinite,
-                    child: Shimmer.fromColors(
-                        baseColor: light.withOpacity(.2),
-                        highlightColor: light_grey.withOpacity(.2),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: active,
-                                    borderRadius: BorderRadius.circular(20)),
-                                height: 20,
-                                width: 100,
-                              ),
-                            ),
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: active,
-                                    borderRadius: BorderRadius.circular(20)),
-                              ),
-                            ),
-                          ],
-                        ))),
-              ),
+              ResponsiveWidget.is_small_screen(context)
+                  ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                          height: 620,
+                          width: double.maxFinite,
+                          child: Shimmer.fromColors(
+                              baseColor: light.withOpacity(.2),
+                              highlightColor: light_grey.withOpacity(.2),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 8),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: active,
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      height: 20,
+                                      width: 100,
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 592,
+                                    decoration: BoxDecoration(
+                                        color: active,
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                  ),
+                                ],
+                              ))),
+                    )
+                  : Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                            // height:
+                            //     ResponsiveWidget.is_small_screen(context) ? 640 : 740,
+                            width: double.maxFinite,
+                            child: Shimmer.fromColors(
+                                baseColor: light.withOpacity(.2),
+                                highlightColor: light_grey.withOpacity(.2),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                        height: 20,
+                                        width: 100,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                      ),
+                                    ),
+                                  ],
+                                ))),
+                      ),
+                    ),
             ],
           ),
         ),
@@ -880,12 +1220,338 @@ class _TickerActions extends StatelessWidget {
             final ticker_actions = snapshot.data as List;
             return Container(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: ResponsiveWidget.is_small_screen(context)
+                    ? CrossAxisAlignment.start
+                    : CrossAxisAlignment.stretch,
                 children: [
-                  Container(
-                    height:
-                        ResponsiveWidget.is_small_screen(context) ? 300 : 787,
+                  ResponsiveWidget.is_small_screen(context)
+                      ? Container(
+                          height: 400,
+                          decoration: BoxDecoration(
+                              color: dark,
+                              borderRadius: BorderRadius.circular(20)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 8, horizontal: 8),
+                                        child: CustomText(
+                                          text: 'Actions',
+                                          color: light,
+                                          size: 22,
+                                        ),
+                                      ),
+                                      Container(
+                                        height: 1,
+                                        width: double.maxFinite,
+                                        color: light,
+                                      ),
+                                      DataTable2(
+                                        headingRowColor:
+                                            MaterialStateColor.resolveWith(
+                                                (states) => dark),
+                                        dataRowColor:
+                                            MaterialStateColor.resolveWith(
+                                                (states) => dark),
+                                        headingTextStyle:
+                                            const TextStyle(color: light),
+                                        dataTextStyle:
+                                            const TextStyle(color: light),
+                                        columnSpacing: 12,
+                                        horizontalMargin: 12,
+                                        minWidth: 300,
+                                        columns: [
+                                          const DataColumn2(
+                                            label: Text('Date',
+                                                style:
+                                                    TextStyle(color: active)),
+                                            size: ColumnSize.L,
+                                          ),
+                                          const DataColumn2(
+                                            label: Text('Action',
+                                                style:
+                                                    TextStyle(color: active)),
+                                            size: ColumnSize.L,
+                                          ),
+                                          const DataColumn2(
+                                            label: Text('Price',
+                                                style:
+                                                    TextStyle(color: active)),
+                                            size: ColumnSize.L,
+                                          ),
+                                          const DataColumn2(
+                                            label: Text('Profit',
+                                                style:
+                                                    TextStyle(color: active)),
+                                            size: ColumnSize.S,
+                                          ),
+                                        ],
+                                        rows: ticker_actions
+                                            .map(
+                                              (data) => DataRow(cells: [
+                                                DataCell(Text(
+                                                    DateFormat('yy-MM-dd hh:mm')
+                                                        .format(DateTime.parse(
+                                                            data['date'])))),
+                                                DataCell(Text(
+                                                  data['action'],
+                                                  style: TextStyle(
+                                                      color: data['action'] ==
+                                                              'Sell'
+                                                          ? success
+                                                          : danger),
+                                                )),
+                                                DataCell(Text(
+                                                    data['price'].toString() +
+                                                        '\$')),
+                                                DataCell(Text(
+                                                  data['profit'].toString() +
+                                                      '\$',
+                                                  style: TextStyle(
+                                                      color: data['profit'] > 0
+                                                          ? success
+                                                          : data['profit'] < 0
+                                                              ? danger
+                                                              : light_grey),
+                                                )),
+                                              ]),
+                                            )
+                                            .toList(),
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                          ),
+                        )
+                      : Expanded(
+                          child: Container(
+                            // height:
+                            //     ResponsiveWidget.is_small_screen(context) ? 300 : 787,
+                            decoration: BoxDecoration(
+                                color: dark,
+                                borderRadius: BorderRadius.circular(20)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: SingleChildScrollView(
+                                  scrollDirection: Axis.vertical,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 8, horizontal: 8),
+                                          child: CustomText(
+                                            text: 'Actions',
+                                            color: light,
+                                            size: 22,
+                                          ),
+                                        ),
+                                        Container(
+                                          height: 1,
+                                          width: double.maxFinite,
+                                          color: light,
+                                        ),
+                                        DataTable2(
+                                          headingRowColor:
+                                              MaterialStateColor.resolveWith(
+                                                  (states) => dark),
+                                          dataRowColor:
+                                              MaterialStateColor.resolveWith(
+                                                  (states) => dark),
+                                          headingTextStyle:
+                                              const TextStyle(color: light),
+                                          dataTextStyle:
+                                              const TextStyle(color: light),
+                                          columnSpacing: 12,
+                                          horizontalMargin: 12,
+                                          minWidth: 300,
+                                          columns: [
+                                            const DataColumn2(
+                                              label: Text('Date',
+                                                  style:
+                                                      TextStyle(color: active)),
+                                              size: ColumnSize.L,
+                                            ),
+                                            const DataColumn2(
+                                              label: Text('Action',
+                                                  style:
+                                                      TextStyle(color: active)),
+                                              size: ColumnSize.L,
+                                            ),
+                                            const DataColumn2(
+                                              label: Text('Price',
+                                                  style:
+                                                      TextStyle(color: active)),
+                                              size: ColumnSize.L,
+                                            ),
+                                            const DataColumn2(
+                                              label: Text('Profit',
+                                                  style:
+                                                      TextStyle(color: active)),
+                                              size: ColumnSize.S,
+                                            ),
+                                          ],
+                                          rows: ticker_actions
+                                              .map(
+                                                (data) => DataRow(cells: [
+                                                  DataCell(Text(DateFormat(
+                                                          'yy-MM-dd hh:mm')
+                                                      .format(DateTime.parse(
+                                                          data['date'])))),
+                                                  DataCell(Text(
+                                                    data['action'],
+                                                    style: TextStyle(
+                                                        color: data['action'] ==
+                                                                'Sell'
+                                                            ? success
+                                                            : danger),
+                                                  )),
+                                                  DataCell(Text(
+                                                      data['price'].toString() +
+                                                          '\$')),
+                                                  DataCell(Text(
+                                                    data['profit'].toString() +
+                                                        '\$',
+                                                    style: TextStyle(
+                                                        color: data['profit'] >
+                                                                0
+                                                            ? success
+                                                            : data['profit'] < 0
+                                                                ? danger
+                                                                : light_grey),
+                                                  )),
+                                                ]),
+                                              )
+                                              .toList(),
+                                        ),
+                                      ],
+                                    ),
+                                  )),
+                            ),
+                          ),
+                        ),
+                ],
+              ),
+            );
+          }
+          return const _ActionsShimmer();
+        },
+        future: c.load_ticker_actions(ticker, 1),
+      );
+    }
+    return Container(
+      child: Column(
+        crossAxisAlignment: ResponsiveWidget.is_small_screen(context)
+            ? CrossAxisAlignment.start
+            : CrossAxisAlignment.stretch,
+        children: [
+          ResponsiveWidget.is_small_screen(context)
+              ? Container(
+                  height: 400,
+                  decoration: BoxDecoration(
+                      color: dark, borderRadius: BorderRadius.circular(20)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 8, horizontal: 8),
+                                child: CustomText(
+                                  text: 'Actions',
+                                  color: light,
+                                  size: 22,
+                                ),
+                              ),
+                              Container(
+                                height: 1,
+                                width: double.maxFinite,
+                                color: light,
+                              ),
+                              DataTable2(
+                                headingRowColor: MaterialStateColor.resolveWith(
+                                    (states) => dark),
+                                dataRowColor: MaterialStateColor.resolveWith(
+                                    (states) => dark),
+                                headingTextStyle: const TextStyle(color: light),
+                                dataTextStyle: const TextStyle(color: light),
+                                columnSpacing: 12,
+                                horizontalMargin: 12,
+                                minWidth: 300,
+                                columns: [
+                                  const DataColumn2(
+                                    label: Text('Date',
+                                        style: TextStyle(color: active)),
+                                    size: ColumnSize.L,
+                                  ),
+                                  const DataColumn2(
+                                    label: Text('Action',
+                                        style: TextStyle(color: active)),
+                                    size: ColumnSize.L,
+                                  ),
+                                  const DataColumn2(
+                                    label: Text('Price',
+                                        style: TextStyle(color: active)),
+                                    size: ColumnSize.L,
+                                  ),
+                                  const DataColumn2(
+                                    label: Text('Profit',
+                                        style: TextStyle(color: active)),
+                                    size: ColumnSize.S,
+                                  ),
+                                ],
+                                rows: c.ticker_actions
+                                    .map(
+                                      (data) => DataRow(cells: [
+                                        DataCell(Text(
+                                            DateFormat('yy-MM-dd hh:mm').format(
+                                                DateTime.parse(data['date'])))),
+                                        DataCell(Text(
+                                          data['action'],
+                                          style: TextStyle(
+                                              color: data['action'] == 'Sell'
+                                                  ? success
+                                                  : danger),
+                                        )),
+                                        DataCell(Text(
+                                            data['price'].toString() + '\$')),
+                                        DataCell(Text(
+                                          data['profit'].toString() + '\$',
+                                          style: TextStyle(
+                                              color: data['profit'] > 0
+                                                  ? success
+                                                  : data['profit'] < 0
+                                                      ? danger
+                                                      : light_grey),
+                                        )),
+                                      ]),
+                                    )
+                                    .toList(),
+                              ),
+                            ],
+                          ),
+                        )),
+                  ),
+                )
+              : Expanded(
+                  child: Container(
+                    // height: ResponsiveWidget.is_small_screen(context) ? 340 : 787,
                     decoration: BoxDecoration(
                         color: dark, borderRadius: BorderRadius.circular(20)),
                     child: Padding(
@@ -945,7 +1611,7 @@ class _TickerActions extends StatelessWidget {
                                       size: ColumnSize.S,
                                     ),
                                   ],
-                                  rows: ticker_actions
+                                  rows: c.ticker_actions
                                       .map(
                                         (data) => DataRow(cells: [
                                           DataCell(Text(
@@ -979,111 +1645,7 @@ class _TickerActions extends StatelessWidget {
                           )),
                     ),
                   ),
-                ],
-              ),
-            );
-          }
-          return const _ActionsShimmer();
-        },
-        future: c.load_ticker_actions(ticker, 1),
-      );
-    }
-    return Container(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Container(
-            height: ResponsiveWidget.is_small_screen(context) ? 340 : 787,
-            decoration: BoxDecoration(
-                color: dark, borderRadius: BorderRadius.circular(20)),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                          child: CustomText(
-                            text: 'Actions',
-                            color: light,
-                            size: 22,
-                          ),
-                        ),
-                        Container(
-                          height: 1,
-                          width: double.maxFinite,
-                          color: light,
-                        ),
-                        DataTable2(
-                          headingRowColor:
-                              MaterialStateColor.resolveWith((states) => dark),
-                          dataRowColor:
-                              MaterialStateColor.resolveWith((states) => dark),
-                          headingTextStyle: const TextStyle(color: light),
-                          dataTextStyle: const TextStyle(color: light),
-                          columnSpacing: 12,
-                          horizontalMargin: 12,
-                          minWidth: 300,
-                          columns: [
-                            const DataColumn2(
-                              label:
-                                  Text('Date', style: TextStyle(color: active)),
-                              size: ColumnSize.L,
-                            ),
-                            const DataColumn2(
-                              label: Text('Action',
-                                  style: TextStyle(color: active)),
-                              size: ColumnSize.L,
-                            ),
-                            const DataColumn2(
-                              label: Text('Price',
-                                  style: TextStyle(color: active)),
-                              size: ColumnSize.L,
-                            ),
-                            const DataColumn2(
-                              label: Text('Profit',
-                                  style: TextStyle(color: active)),
-                              size: ColumnSize.S,
-                            ),
-                          ],
-                          rows: c.ticker_actions
-                              .map(
-                                (data) => DataRow(cells: [
-                                  DataCell(Text(DateFormat('yy-MM-dd hh:mm')
-                                      .format(DateTime.parse(data['date'])))),
-                                  DataCell(Text(
-                                    data['action'],
-                                    style: TextStyle(
-                                        color: data['action'] == 'Sell'
-                                            ? success
-                                            : danger),
-                                  )),
-                                  DataCell(
-                                      Text(data['price'].toString() + '\$')),
-                                  DataCell(Text(
-                                    data['profit'].toString() + '\$',
-                                    style: TextStyle(
-                                        color: data['profit'] > 0
-                                            ? success
-                                            : data['profit'] < 0
-                                                ? danger
-                                                : light_grey),
-                                  )),
-                                ]),
-                              )
-                              .toList(),
-                        ),
-                      ],
-                    ),
-                  )),
-            ),
-          ),
+                ),
         ],
       ),
     );
@@ -1097,154 +1659,302 @@ class _ActionsShimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: ResponsiveWidget.is_small_screen(context)
+            ? CrossAxisAlignment.start
+            : CrossAxisAlignment.stretch,
         children: [
-          Container(
-            decoration: BoxDecoration(
-                color: dark, borderRadius: BorderRadius.circular(20)),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
+          ResponsiveWidget.is_small_screen(context)
+              ? Container(
+                  decoration: BoxDecoration(
+                      color: dark, borderRadius: BorderRadius.circular(20)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                          child: CustomText(
-                            text: 'Actions',
-                            color: light,
-                            size: 22,
-                          ),
-                        ),
-                        Container(
-                          height: 1,
-                          width: double.maxFinite,
-                          color: light,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: light.withOpacity(.2),
-                              borderRadius: BorderRadius.circular(20),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 8),
+                            child: CustomText(
+                              text: 'Actions',
+                              color: light,
+                              size: 22,
                             ),
-                            height: 744,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8),
-                              child: Shimmer.fromColors(
-                                baseColor: light.withOpacity(.2),
-                                highlightColor: light_grey.withOpacity(.2),
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                    Container(
-                                        height: 20,
-                                        decoration: BoxDecoration(
-                                          color: active,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        )),
-                                  ],
+                          ),
+                          Container(
+                            height: 1,
+                            width: double.maxFinite,
+                            color: light,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: light.withOpacity(.2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              height: 400,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: Shimmer.fromColors(
+                                  baseColor: light.withOpacity(.2),
+                                  highlightColor: light_grey.withOpacity(.2),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                      Container(
+                                          height: 20,
+                                          decoration: BoxDecoration(
+                                            color: active,
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          )),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        )
-                      ],
+                          )
+                        ],
+                      ),
                     ),
-                  )),
-            ),
-          ),
+                  ),
+                )
+              : Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: dark, borderRadius: BorderRadius.circular(20)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 8),
+                              child: CustomText(
+                                text: 'Actions',
+                                color: light,
+                                size: 22,
+                              ),
+                            ),
+                            Container(
+                              height: 1,
+                              width: double.maxFinite,
+                              color: light,
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: light.withOpacity(.2),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  // height: 744,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: Shimmer.fromColors(
+                                      baseColor: light.withOpacity(.2),
+                                      highlightColor:
+                                          light_grey.withOpacity(.2),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: [
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                          Container(
+                                              height: 20,
+                                              decoration: BoxDecoration(
+                                                color: active,
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              )),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
         ],
       ),
     );
